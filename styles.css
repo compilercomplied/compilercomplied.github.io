@@ -1,0 +1,78 @@
+/**/
+
+html * {
+    
+    background-color: white;
+    
+    font-size:      24px;
+    font-family:    'IBM Plex Mono';
+
+}
+
+.header-title {
+
+    font-size: 28px !important;
+}
+
+.box {
+    
+    height:     80%;
+    padding:    0;
+    margin:     0;
+
+    align-items:        center;
+    justify-content:    center;
+    vertical-align:     baseline;
+
+    flex-direction: column;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+}
+
+.main-table {
+    
+    border: none;
+    border-collapse: collapse;
+
+}
+
+.main-table td {
+    
+    border-left:    1px solid #000000;
+    border-right:   1px solid #000000;
+
+    padding: 0 15px 0 15px;
+    
+}
+
+.main-table td:first-child {
+
+    border-left: none;
+    text-align: right;
+
+}
+
+.main-table td:last-child {
+    border-right: none;
+
+}
+
+a:link {
+    color: #000000;
+    
+}
+
+a:visited {
+    color: #666666;
+
+}
+
+a:hover {
+    color: #999999;
+
+}
