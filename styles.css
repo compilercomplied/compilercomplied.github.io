@@ -1,78 +1,74 @@
-/**/
+* {
 
-html * {
-    
-    background-color: white;
-    
-    font-size:      24px;
-    font-family:    'IBM Plex Mono';
+	background: var(--bg);
+	color: var(--fg);
+
+	font-family: 'IBM Plex Sans', sans-serif;
 
 }
 
-.header-title {
-
-    font-size: 28px !important;
+.fab {
+	color: var(--bold-fg);
+	margin-right: 1rem;
 }
 
-.box {
-    
-    height:     80%;
-    padding:    0;
-    margin:     0;
-
-    align-items:        center;
-    justify-content:    center;
-    vertical-align:     baseline;
-
-    flex-direction: column;
-
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
+.inline-about {
+	display: flex;
 
 }
 
-.main-table {
-    
-    border: none;
-    border-collapse: collapse;
+
+#body-container {
+
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
 
 }
 
-.main-table td {
-    
-    border-left:    1px solid #000000;
-    border-right:   1px solid #000000;
+#about-me {
 
-    padding: 0 15px 0 15px;
-    
-}
+	font-size: 2.5rem;
 
-.main-table td:first-child {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	width: 50rem;
+	height: 15rem;
 
-    border-left: none;
-    text-align: right;
 
 }
 
-.main-table td:last-child {
-    border-right: none;
+#separator {
+
+	background: var(--accent-tertiary);
+	width: 0.25rem;
+	height: 90%;
+	margin-left: 1rem;
+	margin-right: 1rem;
 
 }
 
-a:link {
-    color: #000000;
-    
+.about-panel {
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	justify-content: space-evenly;
+
 }
 
-a:visited {
-    color: #666666;
+#about-left {
+	align-items: flex-end;
 
 }
 
-a:hover {
-    color: #999999;
+#about-right {
+	align-items: flex-start;
 
 }

@@ -1,45 +1,85 @@
+<html>
+
 <head>
-
-  <meta charset="UTF-8">
-
-  <link rel="stylesheet" href="styles.css">
-
-  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=IBM Plex Mono'>
-
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+	<meta charset="utf-8">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200&display=swap" rel="stylesheet"> 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
   integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+	<style>
+		@media (prefers-color-scheme: light) {
+			:root {
+
+				--bg: #f2f1eb;
+				--fg: #445128;
+				--accent-primary: #e9766d;
+				--accent-secondary: #83a146;
+				--accent-tertiary: #b1534c;
+
+				--bold-fg: #202613;
+
+			}
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+
+				--bg: #121b21;
+				--fg: #e88d7a;
+				--accent-primary: #8ebcbf;
+				--accent-secondary: #b1534c;
+				--accent-tertiary: #448088;
+
+				--bold-fg: #e8798b;
+
+			}
+		}
+	</style>
+
+	<link rel="stylesheet" href="./style.css">
+
+	<title>About - Darío</title>
 
 </head>
 
 <body>
-  <div class="box">
 
-    <div class="header-container">
-      <p class="header-title">Darío</p>
-    </div>
-    <div class="main-table-container">
-      <table class="main-table">
-        <tr>
-          <td>
-            <p>software developer</p>
-          </td>
-          <td>
-            <a href="https://twitter.com/sinecodes">
-              <i class="fab fa-twitter"></i>
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="mailto:git.gdario+about@gmail.com">contact</a>
-          </td>
-          <td>
-            <a href="https://github.com/compilercomplied">
-              <i class="fab fa-github"></i>
-            </a>
-          </td>
-        </tr>
-      </table>
-    </div>
-  </div>
+	<div id="body-container">
+
+		<div id="about-me">
+			<div class="about-panel" id="about-left">
+
+				<div>
+					Darío Gullón
+				</div>
+				<div>
+					<a href="https://google.com/maps/place/Asturias">Asturias</a>
+				</div>
+
+			</div>
+
+			<div id="separator"></div>
+
+			<div class="about-panel" id="about-right">
+
+				<div>
+					Software developer
+				</div>
+				<div class="inline-about">
+					<a href="https://github.com/compilercomplied">
+						<i class="fab fa-github"></i>
+					</a>
+					<a href="https://twitter.com/sinecodes">
+						<i class="fab fa-twitter"></i>
+					</a>
+				</div>
+
+			</div>
+
+		</div>
+
 </body>
+
+</html>
