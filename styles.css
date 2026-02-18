@@ -1,74 +1,130 @@
+:root {
+    --bg-color: #f4f4f4;
+    --text-color: #161616;
+    --border-color: #e0e0e0;
+    --accent-color: #0f62fe;
+    --secondary-text: #525252;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #161616;
+        --text-color: #f4f4f4;
+        --border-color: #393939;
+        --accent-color: #4589ff;
+        --secondary-text: #a8a8a8;
+    }
+}
+
 * {
-
-	background: var(--bg);
-	color: var(--fg);
-
-	font-family: 'IBM Plex Sans', sans-serif;
-
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.fab {
-	color: var(--bold-fg);
-	font-size: 2.0rem;
-	margin-right: 1rem;
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.inline-about {
-	display: flex;
+header {
+    padding: 2rem 1.5rem 0 1.5rem; /* Spacing over the top and side padding for the screen edges */
+}
 
+nav {
+    width: 100%;
+}
+
+.nav-container {
+    padding: 1.25rem 2rem;
+    border-top: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Corner ticks to create the 'surrounding box with open sides' effect */
+.nav-container::before, .nav-container::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px; /* Length of the vertical segments at the corners */
+    pointer-events: none;
+}
+
+/* Top corners: vertical ticks pointing downwards from the top border */
+.nav-container::before {
+    top: 0;
+    border-left: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
+}
+
+/* Bottom corners: vertical ticks pointing upwards from the bottom border */
+.nav-container::after {
+    bottom: 0;
+    border-left: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
 }
 
 
-#body-container {
 
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	height: 100%;
-
+.nav-home {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 400;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
 }
 
-#about-me {
-
-	font-size: 2.5rem;
-
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-	width: 50rem;
-	height: 15rem;
-
-
+.nav-home:hover {
+    color: var(--accent-color);
 }
 
-#separator {
-
-	background: var(--accent-tertiary);
-	width: 0.25rem;
-	height: 90%;
-	margin-left: 1rem;
-	margin-right: 1rem;
-
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
 }
 
-.about-panel {
-
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-
-	justify-content: space-evenly;
-
+.hero {
+    text-align: center;
+    max-width: 600px;
 }
 
-#about-left {
-	align-items: flex-end;
-
+.name {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
 }
 
-#about-right {
-	align-items: flex-start;
+.description {
+    font-size: 1.125rem;
+    color: var(--secondary-text);
+    font-weight: 300;
+}
 
+@media (max-width: 600px) {
+    .name {
+        font-size: 2rem;
+    }
+    
+    .description {
+        font-size: 1rem;
+    }
+    
+    header {
+        padding: 1.5rem 1rem;
+    }
 }
