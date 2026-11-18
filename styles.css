@@ -115,6 +115,31 @@ main {
     font-weight: 300;
 }
 
+.app-info {
+    width: min(100%, 42rem);
+    overflow-wrap: anywhere;
+}
+
+.app-info h2 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.app-info p,
+.app-info nav {
+    margin-top: 0.75rem;
+}
+
+.app-info nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+
+.app-info a {
+    color: var(--accent-color);
+}
+
 @media (max-width: 600px) {
     .name {
         font-size: 2rem;
