@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+  <!-- A 4×4 Bayer matrix, with each threshold covering 2×2 CSS pixels. -->
+  <path fill="#080808" d="M0 0h2v2H0z"/>
+  <path fill="#888888" d="M2 0h2v2H2z"/>
+  <path fill="#282828" d="M4 0h2v2H4z"/>
+  <path fill="#a8a8a8" d="M6 0h2v2H6z"/>
+  <path fill="#c8c8c8" d="M0 2h2v2H0z"/>
+  <path fill="#484848" d="M2 2h2v2H2z"/>
+  <path fill="#e8e8e8" d="M4 2h2v2H4z"/>
+  <path fill="#686868" d="M6 2h2v2H6z"/>
+  <path fill="#383838" d="M0 4h2v2H0z"/>
+  <path fill="#b8b8b8" d="M2 4h2v2H2z"/>
+  <path fill="#181818" d="M4 4h2v2H4z"/>
+  <path fill="#989898" d="M6 4h2v2H6z"/>
+  <path fill="#f8f8f8" d="M0 6h2v2H0z"/>
+  <path fill="#787878" d="M2 6h2v2H2z"/>
+  <path fill="#d8d8d8" d="M4 6h2v2H4z"/>
+  <path fill="#585858" d="M6 6h2v2H6z"/>
+</svg>

@@ -25,4 +25,12 @@ The neutral tokens and shared styles live in `static/styles.css`. The homepage a
 
 ## Publish on GitHub Pages
 
-For the Zola cutover, retain `gdario.dev` in the repository's Pages custom domain settings and set the Pages source to **GitHub Actions**. The workflow checks pull requests and builds and deploys pushes to `master`.
+GitHub Pages serves the repository root on `master`. Edit the Zola sources in `content/`, `templates/`, and `static/`, then build and copy the generated files into the publishing root.
+
+```sh
+mise run check
+mise run build
+cp -R public/. .
+```
+
+If you removed a page or asset, remove its old generated copy from the publishing root too. Commit the source and generated files together, then push to `master` to publish to `gdario.dev`. The **Check site** workflow verifies that the Zola source builds.
