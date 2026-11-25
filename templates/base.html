@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="{{ config.default_language }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    <script src="{{ get_url(path="theme.js") }}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ get_url(path="styles.css") }}">
+    {% block styles %}{% endblock styles %}
+</head>
+<body>
+    <div class="site{% block site_class %}{% endblock site_class %}">
+        {% set blog = get_section(path="blog/_index.md") %}
+        <header class="site-header">
+            <nav class="nav-container site-nav" aria-label="Site navigation">
+                <div class="nav-links">
+                    <a class="nav-home" href="{{ get_url(path="/") }}">home</a>
+                    {% if blog.pages | length > 0 %}
+                    <a class="nav-home" href="{{ blog.permalink }}">blog</a>
+                    {% endif %}
+                </div>
+                <svg class="theme-symbols" width="0" height="0" aria-hidden="true" focusable="false">
+                    <symbol id="theme-icon-system" viewBox="0 0 24 24">
+                        <rect x="3.5" y="5" width="17" height="12" rx="1"/>
+                        <path d="M12 17v3m-4 0h8"/>
+                    </symbol>
+                    <symbol id="theme-icon-light" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2.5v2m0 15v2M2.5 12h2m15 0h2M5.3 5.3l1.4 1.4m10.6 10.6 1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/>
+                    </symbol>
+                    <symbol id="theme-icon-dark" viewBox="0 0 24 24">
+                        <path d="M21 13.2A9 9 0 0 1 10.8 3a9 9 0 1 0 10.2 10.2Z"/>
+                    </symbol>
+                </svg>
+                <fieldset class="theme-control theme-fallback" aria-label="Theme">
+                    <input id="theme-system" name="theme" type="radio" aria-label="System" checked>
+                    <input id="theme-light" name="theme" type="radio" aria-label="Light">
+                    <input id="theme-dark" name="theme" type="radio" aria-label="Dark">
+                    <label for="theme-light" title="Theme: system. Switch to light." aria-hidden="true">
+                        <svg class="theme-icon" aria-hidden="true" focusable="false"><use href="#theme-icon-system"/></svg>
+                    </label>
+                    <label for="theme-dark" title="Theme: light. Switch to dark." aria-hidden="true">
+                        <svg class="theme-icon" aria-hidden="true" focusable="false"><use href="#theme-icon-light"/></svg>
+                    </label>
+                    <label for="theme-system" title="Theme: dark. Switch to system." aria-hidden="true">
+                        <svg class="theme-icon" aria-hidden="true" focusable="false"><use href="#theme-icon-dark"/></svg>
+                    </label>
+                </fieldset>
+                <button class="theme-control theme-toggle" type="button" aria-label="Change theme" hidden>
+                    {% for mode in ["system", "light", "dark"] %}
+                    <svg class="theme-icon" data-icon="{{ mode }}" aria-hidden="true" focusable="false">
+                        <use href="#theme-icon-{{ mode }}"/>
+                    </svg>
+                    {% endfor %}
+                </button>
+            </nav>
+        </header>
+        {% block content %}{% endblock content %}
+    </div>
+</body>
+</html>

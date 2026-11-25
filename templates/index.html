@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block site_class %} homepage{% endblock site_class %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ get_url(path="home.css") }}">
+<script src="{{ get_url(path="dither-cursor.js") }}" defer></script>
+{% endblock styles %}
+
+{% block content %}
+<main class="home-main">
+    <section class="hero" aria-labelledby="site-name">
+        <h1 class="hero-name" id="site-name">{{ config.title }}</h1>
+        <p class="hero-description">{{ config.description }}</p>
+    </section>
+</main>
+<div class="background-art" aria-hidden="true">
+    <svg width="0" height="0" focusable="false" style="position: absolute">
+        <filter id="page-dither-cursor" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            {% include "cursor-field.html" %}
+            <feDisplacementMap in="SourceGraphic" in2="cursor-field" scale="0" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+            <feComposite in="displaced" in2="cursor-clearance" operator="out"/>
+        </filter>
+        <filter id="hill-dither" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feColorMatrix in="SourceGraphic" type="saturate" values="0" result="luminance"/>
+            <feImage href="{{ get_url(path="images/bayer-threshold.svg") }}" x="0" y="0" width="8" height="8" result="threshold-cell"/>
+            <feTile in="threshold-cell" result="thresholds"/>
+            {% include "cursor-field.html" %}
+            <feDisplacementMap in="thresholds" in2="cursor-field" scale="0" xChannelSelector="R" yChannelSelector="G" result="displaced-thresholds"/>
+            <!-- Offset each pixel by its Bayer threshold before mapping it to one of three tones. -->
+            <feComposite in="luminance" in2="displaced-thresholds" operator="arithmetic" k2=".666667" k3=".333333"/>
+            <feComponentTransfer>
+                <feFuncR type="discrete" tableValues=".11 .53 .96"/>
+                <feFuncG type="discrete" tableValues=".11 .53 .96"/>
+                <feFuncB type="discrete" tableValues=".11 .53 .96"/>
+            </feComponentTransfer>
+            <!-- Preserve the source when the threshold tile cannot be loaded. -->
+            <feComposite in2="thresholds" operator="in" result="dithered"/>
+            <feComposite in="dithered" in2="cursor-clearance" operator="out"/>
+            <feComposite in2="SourceGraphic" operator="over"/>
+        </filter>
+    </svg>
+    <div class="dither-field"></div>
+    <div class="hill-corner">
+        <img class="hill-image" src="{{ get_url(path="images/steep-hills.webp") }}" alt="">
+    </div>
+</div>
+{% endblock content %}

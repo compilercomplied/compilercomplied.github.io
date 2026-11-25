@@ -1,0 +1,11 @@
+[tools]
+zola = "0.23.6"
+
+[tasks.serve]
+run = "zola serve"
+
+[tasks.check]
+run = "zola check --skip-external-links"
+
+[tasks.build]
+run = "zola build"
