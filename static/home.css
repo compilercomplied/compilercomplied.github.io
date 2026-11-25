@@ -63,12 +63,20 @@
     position: absolute;
     inset: 0;
     opacity: var(--dither-opacity);
-    background: radial-gradient(circle at 1px 1px, var(--dither-ink) .52px, transparent .91px) 0 0 / 4px 4px;
+    color: var(--dither-ink);
+    background: radial-gradient(circle at 1px 1px, currentColor .52px, transparent .91px) 0 0 / 4px 4px;
     mask-image: radial-gradient(ellipse 105% 110% at 100% 104%, #000 2%, #000c 50%, #0009 65%, #0004 85%, transparent 100%);
 }
 
 .homepage[data-dither-active] .dither-field {
-    filter: url(#page-dither-cursor);
+    background: none;
+}
+
+.dither-ripple {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
 }
 
 .hill-corner {
