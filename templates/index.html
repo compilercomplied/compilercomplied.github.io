@@ -3,8 +3,8 @@
 {% block site_class %} homepage{% endblock site_class %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ get_url(path="home.css") }}">
-<script src="{{ get_url(path="dither-cursor.js") }}" defer></script>
+<link rel="stylesheet" href="{{ get_url(path="home.css", cachebust=true) }}">
+<script src="{{ get_url(path="dither-cursor.js", cachebust=true) }}" defer></script>
 {% endblock styles %}
 
 {% block content %}
@@ -23,7 +23,7 @@
         </filter>
         <filter id="hill-dither" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
             <feColorMatrix in="SourceGraphic" type="saturate" values="0" result="luminance"/>
-            <feImage href="{{ get_url(path="images/bayer-threshold.svg") }}" x="0" y="0" width="8" height="8" result="threshold-cell"/>
+            <feImage href="{{ get_url(path="images/bayer-threshold.svg", cachebust=true) }}" x="0" y="0" width="8" height="8" result="threshold-cell"/>
             <feTile in="threshold-cell" result="thresholds"/>
             {% include "cursor-field.html" %}
             <feDisplacementMap in="thresholds" in2="cursor-field" scale="0" xChannelSelector="R" yChannelSelector="G" result="displaced-thresholds"/>
@@ -42,7 +42,7 @@
     </svg>
     <div class="dither-field"></div>
     <div class="hill-corner">
-        <img class="hill-image" src="{{ get_url(path="images/steep-hills.webp") }}" alt="">
+        <img class="hill-image" src="{{ get_url(path="images/steep-hills.webp", cachebust=true) }}" alt="">
     </div>
 </div>
 {% endblock content %}
