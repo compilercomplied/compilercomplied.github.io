@@ -1,4 +1,6 @@
 .homepage {
+    display: grid;
+    grid-template-rows: 1fr auto 1fr;
     position: relative;
     isolation: isolate;
     --hill-width: 86%;
@@ -26,27 +28,40 @@
     }
 }
 
+.homepage > .site-header {
+    grid-area: 1 / 1;
+    align-self: start;
+    z-index: 1;
+}
+
 .home-main {
-    flex: 1 0 auto;
+    grid-area: 1 / 1 / -1;
     display: grid;
-    place-items: center;
-    padding: var(--layout-inset) var(--gap-default);
+    grid-template-rows: subgrid;
+    justify-items: center;
+    padding-inline: var(--gap-default);
 }
 
 .hero {
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-rows: subgrid;
     max-inline-size: 37.5rem;
     text-align: center;
     overflow-wrap: anywhere;
 }
 
 .hero-name {
-    margin: 0 0 var(--frame-return);
+    grid-row: 2;
+    margin: 0;
     font-size: var(--text-display);
     letter-spacing: -.013em;
 }
 
 .hero-description {
-    margin: 0;
+    grid-row: 3;
+    align-self: start;
+    margin: var(--frame-return) 0 var(--layout-inset);
     font-size: var(--text-reading);
 }
 
