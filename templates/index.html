@@ -33,8 +33,9 @@
         </filter>
     </svg>
     <div class="dither-field"><canvas class="dither-ripple" hidden></canvas></div>
-    <div class="hill-corner">
+    <picture class="hill-corner">
+        <source media="(max-width: 37.5rem)" srcset="{{ get_url(path="images/steep-hills-mobile.webp", cachebust=true) }}">
         <img class="hill-image" src="{{ get_url(path="images/steep-hills.webp", cachebust=true) }}" alt="">
-    </div>
+    </picture>
 </div>
 {% endblock content %}
