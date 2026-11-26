@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block site_class %} mood-tracker-page{% endblock site_class %}
+
+{% block styles %}
+<meta name="description" content="{{ page.description }}">
+<link rel="preload" href="{{ get_url(path="project-pages/mood-tracker/roboto-latin.woff2") }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ get_url(path="project-pages/mood-tracker/detail.css", cachebust=true) }}">
+<link rel="stylesheet" href="{{ get_url(path="project-pages/mood-tracker/check-in.css", cachebust=true) }}">
+<script src="{{ get_url(path="project-background.js", cachebust=true) }}" data-from="{{ get_url(path="@/projects.md") }}"></script>
+<script src="{{ get_url(path="project-pages/mood-tracker/check-in.js", cachebust=true) }}" defer></script>
+<script src="{{ get_url(path="project-pages/mood-tracker/framework-preview.js", cachebust=true) }}" defer></script>
+{% endblock styles %}
+
+{% block header_end %}
+<div class="project-back-bar">
+    <a class="project-back" href="{{ get_url(path="@/projects.md") }}" aria-label="Back to Projects">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
+    </a>
+</div>
+{% endblock header_end %}
+
+{% block content %}
+<div class="mood-stage">
+    <div class="mood-backdrop" aria-hidden="true"></div>
+    <main class="mood-detail" aria-labelledby="mood-title" tabindex="0">
+        <div class="mood-content">
+            <header class="mood-intro">
+                <h1 id="mood-title">{{ page.title }}</h1>
+                <a class="mood-store mood-filled-action" href="{{ page.extra.store_url }}">Google Play</a>
+            </header>
+            <section class="mood-concept" aria-labelledby="mood-concept-title">
+                <h2 id="mood-concept-title">Initial concept</h2>
+                <p>{{ page.extra.initial_concept }}</p>
+                <div class="mood-sky-studies">
+                    <figure>
+                        <div class="mood-sky-swatch mood-sky-dawn" aria-hidden="true"></div>
+                        <figcaption>Dawn</figcaption>
+                    </figure>
+                    <figure>
+                        <div class="mood-sky-swatch mood-sky-atmosphere mood-sky-day" aria-hidden="true"></div>
+                        <figcaption>Daylight</figcaption>
+                    </figure>
+                    <figure>
+                        <div class="mood-sky-swatch mood-sky-atmosphere mood-sky-night" aria-hidden="true"></div>
+                        <figcaption>Night</figcaption>
+                    </figure>
+                </div>
+            </section>
+            {% include "mood-framework.html" %}
+            <div class="mood-demo-row">
+                {% include "mood-check-in.html" %}
+                <div class="mood-demo-copy">
+                    {% for paragraph in page.extra.check_in_description %}
+                    <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="mood-demo-row">
+                <div class="mood-demo-copy">
+                    {% for paragraph in page.extra.journal_description %}
+                    <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </div>
+                {% include "mood-memories.html" %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock content %}

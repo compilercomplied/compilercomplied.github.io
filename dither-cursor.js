@@ -8,8 +8,8 @@
     const systemTheme = matchMedia("(prefers-color-scheme: dark)");
     const radius = 96;
     const openingTime = 125;
-    const recoveryTime = 760;
-    const wakeInterval = 105;
+    const recoveryTime = 1300;
+    const wakeInterval = 200;
     const wakeSpacing = 28;
     const wake = Array(6).fill(null);
     const pointLimit = wake.length + 1;
@@ -215,7 +215,7 @@
         } else {
             const distance = Math.hypot(point.x - lastWake.x, point.y - lastWake.y);
             if (distance >= wakeSpacing && time - lastWake.time >= wakeInterval) {
-                wake[nextSlot] = { x: cursor.x, y: cursor.y, pressure: .60 * pressure(cursor, time), releasedAt: time };
+                wake[nextSlot] = { x: cursor.x, y: cursor.y, pressure: .72 * pressure(cursor, time), releasedAt: time };
                 nextSlot = (nextSlot + 1) % wake.length;
                 lastWake = { ...point, time };
             }
@@ -224,13 +224,15 @@
         schedule();
     }, { passive: true });
 
-    main.addEventListener("pointerleave", () => {
+    function releaseCursor() {
         if (!cursor || cursor.releasedAt !== null) return;
         const time = performance.now();
         cursor.pressure = pressure(cursor, time);
         cursor.releasedAt = time;
         schedule();
-    });
+    }
+
+    main.addEventListener("pointerleave", releaseCursor);
     canvas.addEventListener("webglcontextlost", (event) => {
         event.preventDefault();
         reset();
@@ -239,8 +241,8 @@
     canvas.addEventListener("webglcontextrestored", () => {
         renderer = undefined;
     });
+    header.addEventListener("pointerenter", releaseCursor);
     // Finish the ripple before the theme switch repaints the background.
-    header.addEventListener("pointerenter", reset);
     header.querySelector(".theme-toggle").addEventListener("click", reset, { capture: true });
     window.addEventListener("resize", reset);
     window.addEventListener("scroll", reset, { passive: true });

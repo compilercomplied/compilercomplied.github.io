@@ -1,0 +1,562 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Journal · Floating memories</title><style>/* Mood Tracker core · approved 28 October 2026.
+   CSS rem values are web roles; Android dp/sp mappings are separate. */
+:root {
+  --size-navigation:6rem; --size-dialog-max:24rem; --size-edge-fade:var(--space-6);
+  --secondary-veil:rgba(249,247,241,.55); --color-secondary-navigation:#f4f2ed; --color-secondary-selected:#d6d5d066;
+  --space-1:.25rem; --space-2:.5rem; --space-4:1rem; --space-6:1.5rem; --space-8:2rem;
+  --gap-page:var(--space-6);
+  --size-target:3rem; --size-action:5rem; --size-mood:2.5rem; --size-icon:1.5rem;
+  --radius-field:1rem; --radius-sheet:1.5rem; --radius-round:999rem;
+  --font-family:Roboto,Arial,sans-serif;
+  --type-caption:400 .75rem/1.5 var(--font-family);
+  --type-body:400 1rem/1.5 var(--font-family);
+  --type-heading:500 1.5rem/1.25 var(--font-family);
+  --motion-quick:160ms; --motion-fade:320ms; --motion-move:480ms;
+  --motion-ring:640ms; --motion-rotate:960ms; --motion-tick:96ms;
+  --motion-easing:cubic-bezier(.22,.8,.22,1);
+  --screen-height:100svh; --selected-shift:calc(var(--screen-height) * -.3);
+  --color-background:#eaf3fa; --color-text:#344e65; --color-muted:#53697c;
+  --color-surface:#f0f5f9e6; --color-field:#f7fafbd9; --color-border:#8ba4b540;
+  --color-modal:#eef4f8; --color-selected:#c8dae6a6; --color-focus:#53637c;
+  --color-navigation:#e3edf5; --color-action-ink:#503b40;
+  --ambient-one:#b6d6f2; --ambient-two:#b8c8e2; --ambient-three:#d4e8ee;
+  --choice-great:#fac781; --choice-good:#e39385; --choice-okay:#ab7097; --choice-low:#6b578f; --choice-very-low:#2c406f;
+  --metal-base:linear-gradient(145deg,#f2dbc5 0%,#e7c2aa 30%,#d7b6b7 62%,#dfc7b6 100%);
+  --send-ring-color:#e2c3b5;
+}
+[data-appearance=night] {
+  --secondary-veil:rgba(24,25,28,.55); --color-secondary-navigation:#1c1d22; --color-secondary-selected:#d5c9d326;
+  --color-background:#211f32; --color-text:#eee6ee; --color-muted:#c5bdcf;
+  --color-surface:#302d43f2; --color-field:#373348d9; --color-border:#cdc2d229;
+  --color-modal:#302d43; --color-selected:#cbb7d52b; --color-focus:#d6c7d8;
+  --color-navigation:#292638; --color-action-ink:#53465f;
+  --ambient-one:#49436b; --ambient-two:#694b65; --ambient-three:#394d69;
+  --choice-great:#ffce8b; --choice-good:#f19f91; --choice-okay:#be82aa; --choice-low:#826ea8; --choice-very-low:#465c8e;
+  --metal-base:linear-gradient(145deg,#e1dbe8 0%,#e8d0ce 35%,#ecd4b8 65%,#d7ccdf 100%);
+  --send-ring-color:#e5d3cf;
+}
+*{margin:0;box-sizing:border-box}html{font-size:100%}body{background:var(--color-background);color:var(--color-text);font:var(--type-body)}button,textarea{font:inherit}button{cursor:pointer}
+.screen{height:var(--screen-height);width:100%;position:relative;overflow:hidden;isolation:isolate}
+.ambient-background{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:var(--color-background)}
+.ambient-shape{position:absolute;display:block;filter:blur(48px);border-radius:50%}
+.ambient-shape:nth-child(1){width:125%;height:46%;left:-55%;top:5%;background:var(--ambient-one)}
+.ambient-shape:nth-child(2){width:110%;height:48%;right:-55%;top:43%;background:var(--ambient-two)}
+.ambient-shape:nth-child(3){width:110%;height:32%;left:-20%;bottom:-9%;background:var(--ambient-three)}
+/* day-drift-recipe */
+
+
+.ambient-background{isolation:isolate}
+[data-appearance=day] .ambient-shape{will-change:transform;animation:colour-drift 84s ease-in-out infinite alternate}
+[data-appearance=day] .ambient-shape:nth-child(2){animation-duration:106s;animation-delay:-39s;animation-direction:alternate-reverse}
+[data-appearance=day] .ambient-shape:nth-child(3){animation-duration:118s;animation-delay:-56s}
+.cloud-veil{position:absolute;inset:-14%;filter:blur(1.8rem);opacity:.78;will-change:transform;animation:veil-drift 96s ease-in-out infinite alternate;pointer-events:none}</style><style>
+.cloud-puff{position:absolute;background:radial-gradient(ellipse at 27% 55%,#ffffffad 0%,#ffffff6b 24%,transparent 58%),radial-gradient(ellipse at 58% 32%,#ffffffaa 0%,#ffffff69 24%,transparent 60%),radial-gradient(ellipse at 78% 67%,#ffffff88 0%,transparent 57%);border-radius:48%}
+.cloud-puff:nth-child(1){width:105%;height:35%;left:-30%;top:4%;transform:rotate(-14deg)}
+.cloud-puff:nth-child(2){width:110%;height:38%;right:-42%;top:37%;transform:rotate(19deg);opacity:.77}
+.cloud-puff:nth-child(3){width:115%;height:32%;left:-28%;bottom:1%;transform:rotate(-17deg);opacity:.6}
+@keyframes colour-drift{from{transform:translate3d(-14px,12px,0) scale(1.03)}to{transform:translate3d(25px,-20px,0) scale(1.09)}}
+@keyframes veil-drift{from{transform:translate3d(22px,19px,0) scale(1.04)}to{transform:translate3d(-30px,-26px,0) scale(1.08)}}
+@media(prefers-reduced-motion:reduce){[data-appearance=day] .ambient-shape,.cloud-veil{animation:none;will-change:auto}}
+
+/* night-glint-recipe */
+
+.reflection-dust{position:absolute;inset:0;pointer-events:none}
+.reflection-grain{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;background:#ecddd3;opacity:var(--strength);filter:blur(.16px);box-shadow:0 0 3px 1px #e3d4d51a}
+.reflection-grain.lens-glint::after{content:"";position:absolute;width:.65rem;height:.65rem;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#eadad01f,transparent 67%)}
+
+/* mood-orbit-recipe */
+
+
+
+.mood-orbit{position:absolute;z-index:2;inset:0;display:grid;place-items:center;pointer-events:none;font-family:var(--font-family)}
+.orbit-anchor{position:relative;width:var(--size-action);height:var(--size-action);pointer-events:auto}
+.mood-trigger{position:relative;z-index:2;display:grid;place-items:center;width:100%;height:100%;border:1px solid #ffffff24;border-radius:50%;isolation:isolate;overflow:hidden;background:transparent;color:var(--color-action-ink);box-shadow:inset 0 1px 7px #fff6e52e,inset 0 -2px 10px #6f455f0b,0 7px 28px #4e607516;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mood-trigger::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:radial-gradient(ellipse at 32% 22%,#fff9ef55 0%,#fff9ef18 45%,transparent 78%),var(--metal-base);transform:rotate(var(--gradient-turn,0deg));transition:transform var(--motion-rotate) cubic-bezier(.22,.65,.25,1);pointer-events:none}
+.mood-trigger svg{width:var(--size-icon);height:var(--size-icon);transition:none}
+.mood-trigger[aria-expanded=true] svg{transform:none}
+.mood-trigger:active{transform:scale(.96)}
+@media(prefers-reduced-motion:reduce){.mood-trigger::before{transition:none}}
+
+.orbit-caption{position:absolute;top:calc(100% + 1rem);left:50%;transform:translateX(-50%);white-space:nowrap;color:var(--color-muted);font-size:.75rem;font-weight:400;letter-spacing:.025em;line-height:1.5;pointer-events:none}
+.mood-option{position:absolute;inset:50% auto auto 50%;width:var(--size-target);height:var(--size-target);margin:calc(var(--size-target) / -2);display:grid;place-items:center;border:0;background:none;padding:0;border-radius:50%;cursor:pointer;opacity:0;visibility:hidden;transform:translate(0,0) scale(.25);transition:transform var(--motion-move) var(--motion-easing),opacity var(--motion-quick) ease,visibility 0s var(--motion-move);-webkit-tap-highlight-color:transparent}
+.mood-swatch{display:block;width:var(--size-mood);height:var(--size-mood);border-radius:50%;background:var(--mood-fill);transition:transform var(--motion-quick) ease,outline-color var(--motion-quick) ease;outline:1px solid transparent;outline-offset:4px}
+.mood-orbit[data-open=true] .mood-option{opacity:1;visibility:visible;transform:translate(var(--orbit-x),var(--orbit-y)) scale(1);transition-delay:var(--delay),var(--delay),0s}
+.mood-option:hover .mood-swatch{transform:scale(1.1)}
+.mood-option[aria-pressed=true] .mood-swatch{outline:1px solid var(--color-focus)}</style><style>
+.mood-option:focus-visible,.mood-trigger:focus-visible{outline:2px solid var(--color-focus);outline-offset:5px}
+.mood-label{position:absolute;top:calc(100% + .375rem);left:50%;transform:translateX(-50%);color:var(--color-muted);font-size:.75rem;line-height:1.5;white-space:nowrap;opacity:0;pointer-events:none}
+.mood-option:hover .mood-label,.mood-option:focus-visible .mood-label{opacity:1}
+.mood-status{position:absolute;top:calc(100% + 3rem);left:50%;transform:translateX(-50%);width:16rem;text-align:center;color:var(--color-muted);font-size:1rem;line-height:1.5}
+@media(max-width:360px){.mood-option{--orbit-x:calc(var(--compact-x) * 1px)!important}}
+@media(prefers-reduced-motion:reduce){.mood-option,.mood-trigger svg,.mood-swatch{transition:none}}
+
+/* ambient-navigation-recipe */
+
+
+
+.ambient-navigation{position:absolute;z-index:3;inset:auto 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.25rem;padding:var(--space-4) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--color-navigation) 48%);isolation:isolate;font-family:var(--font-family);min-height:var(--size-navigation)}
+.ambient-navigation::before{content:"";position:absolute;z-index:-1;inset:-2.75rem 0 0;background:linear-gradient(to bottom,transparent 0%,color-mix(in srgb,var(--color-navigation) 60%,transparent) 45%,var(--color-navigation) 100%);pointer-events:none}
+.ambient-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);min-width:0;min-height:4rem;padding:0;background:none;border:0;border-radius:var(--radius-field);color:var(--color-muted);font:var(--type-caption);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ambient-nav-icon-slot{display:grid;place-items:center;width:var(--size-target);min-height:var(--space-8);border-radius:var(--radius-round);transition:background-color var(--motion-quick) ease}
+.ambient-nav-icon{display:block;width:var(--size-icon);height:var(--size-icon);background:currentColor;mask:var(--icon-url) center/contain no-repeat;-webkit-mask:var(--icon-url) center/contain no-repeat}
+.ambient-nav-item[aria-current=page]{color:var(--color-text);font-weight:500}
+.ambient-nav-item[aria-current=page] .ambient-nav-icon-slot{background:var(--color-selected)}
+.ambient-nav-item:hover .ambient-nav-icon-slot{background:var(--color-selected)}
+.ambient-nav-item:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.navigation-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(prefers-reduced-motion:reduce){.ambient-nav-icon-slot{transition:none}}
+
+/* entry-draft-recipe */
+
+
+
+.entry-composer{position:absolute;z-index:2;left:var(--gap-page);right:var(--gap-page);bottom:calc(50% + var(--size-action) / 2 + var(--space-6));display:flex;flex-direction:column;gap:var(--space-2);opacity:0;visibility:hidden;transform:none;transition:opacity var(--motion-fade) ease,visibility 0s var(--motion-fade);font-family:var(--font-family)}
+.screen[data-phase=entry] .entry-composer{opacity:1;visibility:visible;transform:none;transition-delay:var(--motion-move),0s}
+.entry-note-group{display:flex;flex-direction:column;gap:var(--space-2)}
+.entry-note-heading{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.entry-optional{font-size:.75rem;color:var(--color-muted)}
+.entry-note{display:block;width:100%;height:var(--size-action);min-height:var(--size-action);padding:var(--space-2) var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-field);background:var(--color-field);color:var(--color-text);font:var(--type-body);resize:none}
+.entry-note::placeholder{color:var(--color-muted);opacity:1}
+.entry-note:focus-visible,.entry-activities-trigger:focus-visible,.entry-picker button:focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}</style><style>
+.entry-activities-trigger{display:flex;align-items:center;gap:var(--space-2);width:100%;min-height:var(--size-target);padding:var(--space-2) var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-field);background:var(--color-surface);color:var(--color-text);font:var(--type-body);cursor:pointer}
+.entry-activities-label{flex:1;text-align:left}
+.entry-activity-count{color:var(--color-muted);font-size:.75rem}
+.entry-activities-trigger svg{width:var(--size-icon);height:var(--size-icon);flex:none}
+.mood-orbit[data-entry=true] .mood-option{opacity:0;visibility:hidden;pointer-events:none}
+.mood-orbit[data-entry=true] .mood-option[aria-pressed=true]{opacity:1;visibility:visible;pointer-events:auto;transform:translate(0,var(--selected-shift)) scale(1.2);transition-delay:0s}
+.mood-orbit[data-entry=true] .mood-option[aria-pressed=true] .mood-label{opacity:1;top:-1.375rem;font-size:.75rem}
+.mood-orbit[data-entry=true] .mood-option[aria-pressed=true] .mood-swatch{outline-color:transparent}
+.mood-orbit[data-entry=true] .mood-trigger svg{transform:none}
+.entry-picker{position:fixed;inset:auto 0 0;margin:0 auto;width:100%;max-width:none;max-height:90vh;padding:1.5rem 1.5rem var(--gap-page);border:1px solid var(--color-border);border-bottom:0;border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;background:var(--color-modal);color:var(--color-text);font-family:var(--font-family);overflow:auto}
+.entry-picker::backdrop{background:#18152666}
+.entry-activity-row{display:flex;align-items:center;gap:var(--space-4);min-height:var(--size-target);font-size:1rem}
+.entry-activity-icon{width:var(--size-icon);height:var(--size-icon);flex:none;background:currentColor;mask:var(--icon-url) center/contain no-repeat;-webkit-mask:var(--icon-url) center/contain no-repeat}
+.entry-activity-row span:nth-child(2){flex:1}
+.entry-activity-row input{width:var(--size-icon);height:var(--size-icon);accent-color:var(--color-focus)}
+.entry-picker-done{display:block;width:100%;min-height:var(--size-target);margin-top:var(--radius-field);border:0;border-radius:var(--radius-round);background:var(--color-selected);color:var(--color-text);font:var(--type-body);cursor:pointer}
+@media(prefers-reduced-motion:reduce){.entry-composer,.screen[data-phase=entry] .entry-composer{transition:none;transition-delay:0s}}
+
+/* send-completion-recipe */
+
+.screen[data-phase=sending] .entry-composer{opacity:0;visibility:visible;pointer-events:none;transition:opacity var(--motion-fade) ease;transition-delay:0s}
+.screen[data-phase=sending] .mood-option[aria-pressed=true]{opacity:0;visibility:visible;pointer-events:none;transition:opacity var(--motion-fade) ease;transition-delay:0s}
+.mood-trigger svg,.orbit-caption{transition:opacity var(--motion-quick) ease}
+.screen[data-phase=sending] .mood-trigger svg,.screen[data-phase=sending] .orbit-caption{opacity:0}
+.screen[data-phase=sending] .mood-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(prefers-reduced-motion:reduce){.screen[data-phase=sending] .entry-composer,.screen[data-phase=sending] .mood-option[aria-pressed=true],.mood-trigger svg,.orbit-caption{transition:none}}
+
+/* send-confirmation-recipe */
+
+.screen[data-phase=confirming] .entry-composer{opacity:1;visibility:visible;transition-delay:0s;pointer-events:none}
+.screen[data-phase=confirming] .mood-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+/* send-ring-recipe */
+.send-ring{position:absolute;inset:-.25rem;z-index:1;border:2px solid var(--send-ring-color);border-radius:50%;opacity:0;pointer-events:none;transform-origin:center}.screen[data-phase=confirming] .orbit-caption{opacity:0}
+.entry-activities-label{min-width:0;overflow-wrap:anywhere}.entry-activity-row{font:var(--type-body)}
+
+/* Shared secondary surfaces and scroll edges. */
+.calendar-screen,.settings-screen{--color-navigation:var(--color-secondary-navigation);--color-selected:var(--color-secondary-selected)}</style><style>
+.secondary-veil{position:absolute;inset:0;z-index:1;background:var(--secondary-veil);pointer-events:none}
+.edge-fade{--edge-top:0px;--edge-bottom:0px;scrollbar-width:none;mask-image:linear-gradient(to bottom,transparent,#000 var(--edge-top),#000 calc(100% - var(--edge-bottom)),transparent);-webkit-mask-image:linear-gradient(to bottom,transparent,#000 var(--edge-top),#000 calc(100% - var(--edge-bottom)),transparent)}
+.edge-fade::-webkit-scrollbar{display:none}
+
+/* Secondary screens: full-screen neutral veil, open content. */
+:root{--calendar-empty:#a5a7a54d;--calendar-future:#a5a7a51f}
+[data-appearance=night]{--calendar-empty:#b1acbd38;--calendar-future:#b1acbd12}
+.calendar-scroll{position:relative;z-index:2;height:calc(100% - var(--size-navigation));overflow:auto;padding:var(--space-8) var(--gap-page) var(--space-8)}
+.caption{font:var(--type-caption);color:var(--color-muted)}
+.year-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-4)}
+.year-heading h2,.history-heading h2{font:var(--type-body);font-weight:500}
+.year-controls{display:flex;align-items:center}
+.icon-button{display:grid;place-items:center;min-width:var(--size-target);min-height:var(--size-target);padding:var(--space-2);border:0;border-radius:50%;background:none;color:var(--color-muted)}
+.ui-icon{display:block;flex:none;width:var(--size-icon);height:var(--size-icon);background:currentColor;mask:var(--icon-url) center/contain no-repeat;-webkit-mask:var(--icon-url) center/contain no-repeat}
+.icon-button:hover{background:var(--color-selected)}
+button:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.year-label{font:var(--type-body);min-width:3rem;text-align:center}
+.month-labels{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));margin-bottom:var(--space-2);font:var(--type-caption);color:var(--color-muted)}
+/* Zoomed year overview: fixed-size squares, locally scrollable month/grid strip. */
+.year-pan{--year-cell-size:.75rem;--year-cell-gap:1px;min-width:0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;touch-action:pan-x pinch-zoom;scrollbar-width:thin;scrollbar-color:var(--color-border) transparent;padding-bottom:var(--space-2)}
+.year-pan:focus-visible{outline:2px solid var(--color-focus);outline-offset:4px}
+.year-pan .month-labels{position:relative;display:block;height:1.125rem;margin-bottom:var(--space-2)}
+.year-pan .month-labels > span:nth-child(n){position:absolute;white-space:nowrap;visibility:visible}
+.year-grid{display:grid;grid-template-rows:repeat(7,var(--year-cell-size));grid-auto-flow:column;grid-auto-columns:var(--year-cell-size);gap:var(--year-cell-gap);width:max-content}
+.year-cell{aspect-ratio:1;border-radius:1px;background:var(--calendar-empty)}
+.year-cell[data-kind=future]{background:var(--calendar-future)}.year-cell[data-kind=outside]{visibility:hidden}
+.mood-legend{display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);margin-top:var(--space-4)}
+.legend-range{display:flex;align-items:center;gap:var(--space-2);font:var(--type-caption);color:var(--color-muted)}
+.legend-swatches{display:flex;gap:var(--space-1)}
+.legend-dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--mood-fill)}
+.legend-empty{width:.5rem;height:.5rem;border-radius:1px;background:var(--calendar-empty)}
+.history-section{margin-top:var(--space-8)}
+.history-heading{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-6)}
+.history-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:var(--space-8)}
+.history-entry{display:grid;grid-template-columns:var(--size-mood) minmax(0,1fr);column-gap:var(--space-4)}
+.history-mood{width:var(--size-mood);height:var(--size-mood);border-radius:50%;background:var(--mood-fill);margin-top:0}
+.entry-content{min-width:0;display:flex;flex-direction:column;gap:var(--space-2)}
+.history-entry-heading{display:flex;align-items:baseline;gap:var(--space-2)}</style><style>
+.entry-title{font:var(--type-caption);font-weight:500;color:var(--color-muted)}
+.entry-note-text{font:var(--type-body);margin:0;overflow-wrap:anywhere}
+.calendar-screen .ambient-navigation::before{inset:-1.5rem 0 0}
+.calendar-screen [hidden]{display:none!important}
+.empty-history{font:var(--type-body);color:var(--color-muted);padding-block:var(--space-8)}
+@media(max-width:350px){.month-labels span:nth-child(even){visibility:hidden}.history-entry{column-gap:var(--space-2)}}
+
+/* Fixed overview, independently scrollable history; alpha masks reveal atmosphere. */
+.calendar-scroll{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+.year-overview{flex:none}
+.history-section{display:flex;flex-direction:column;flex:1;min-height:0}
+.history-heading{flex:none}
+.history-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding:var(--space-1) 0 var(--space-6);}
+.history-scroll:focus-visible{outline:2px solid var(--color-focus);outline-offset:-2px}
+
+/* One check-in preview recipe: Calendar history and With AI source popup. */
+.history-entry{display:grid;grid-template-columns:var(--size-mood) minmax(0,1fr);column-gap:var(--space-4);width:100%}
+.history-mood{width:var(--size-mood);height:var(--size-mood);border-radius:50%;background:var(--mood-fill);margin-top:0}
+.entry-content{min-width:0;display:flex;flex-direction:column;gap:var(--space-2)}
+.history-entry-heading{display:flex;align-items:baseline;gap:var(--space-2)}
+.entry-title{font:var(--type-caption);font-weight:500;color:var(--color-muted)}
+.entry-note-text{font:var(--type-body);margin:0;overflow-wrap:anywhere}
+.two-line-text{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;text-overflow:ellipsis}
+
+/* Exploration-local composition of core tokens, Insights distribution, and entry preview. */
+.journal-screen{--color-navigation:var(--color-secondary-navigation);--color-selected:var(--color-secondary-selected);--memory-open-inset:var(--space-4);--memory-width:calc(100% - 2 * var(--memory-open-inset));--memory-elevation:0 16px 40px #344e6529,0 4px 12px #344e6514}
+.journal-content{position:relative;z-index:2;height:calc(100% - var(--size-navigation));display:flex;flex-direction:column;padding:calc(var(--space-6) + var(--size-target) + var(--space-2)) var(--space-6) 0;gap:var(--space-8)}
+.icon-button{display:grid;place-items:center;min-width:var(--size-target);min-height:var(--size-target);padding:var(--space-2);border:0;border-radius:var(--radius-round);background:none;color:var(--color-text)}
+.icon-button svg,.nav-icon svg{display:block;width:var(--size-icon);height:var(--size-icon)}
+button:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.icon-button:hover,.plain-button:hover{background:var(--color-selected)}
+.recent-moods{display:flex;flex-direction:column;gap:var(--space-4)}
+.recent-moods h2,.stream-heading h2{font:var(--type-body);font-weight:500}
+.recent-moods .distribution{height:var(--space-4);display:flex;overflow:hidden;border-radius:var(--radius-round)}
+.distribution span{background:var(--mood-fill);flex:var(--count)}
+.distribution-labels,.recent-caption{display:flex;justify-content:space-between;gap:var(--space-4);font:var(--type-caption);color:var(--color-muted)}
+.recent-moods .distribution-labels{margin-top:calc(-1 * var(--space-2))}
+.journal-stream{display:flex;flex-direction:column;flex:1;min-height:0;gap:var(--space-6)}
+.journal-note-search{display:flex;align-items:center;gap:var(--space-2);min-height:var(--size-target);padding-inline:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-field);background:var(--color-field);color:var(--color-muted)}
+.journal-note-search svg{flex:none;width:1.125em;height:1.125em}
+.journal-note-search input{flex:1;min-width:0;padding-block:var(--space-2);border:0;background:none;color:var(--color-text);font:var(--type-body)}
+.journal-note-search input::placeholder{color:var(--color-muted);opacity:1}
+.journal-note-search:focus-within{outline:2px solid var(--color-focus);outline-offset:2px}
+.journal-note-search input:focus-visible{outline:none}
+.journal-note-search:has(.journal-search-clear:not([hidden])){padding-inline-end:var(--space-1)}
+#journal-search-status{color:var(--color-muted)}
+.stream-heading{display:flex;align-items:center;justify-content:space-between}
+.plain-button{border:0;background:none;color:var(--color-text);min-height:var(--size-target);padding:var(--space-2);border-radius:var(--radius-field)}
+.stream-scroll{min-height:0;flex:1;overflow:auto;padding-bottom:var(--space-8);overscroll-behavior:contain}</style><style>
+.stream-list,.memory-entries{list-style:none;padding:0;display:flex;flex-direction:column;gap:var(--space-8)}
+.stream-item{border:0;background:none;text-align:left;color:inherit;padding:0;width:100%;border-radius:var(--radius-field)}
+.journal-screen .ambient-navigation{z-index:4}
+.nav-icon{height:var(--space-8);width:var(--size-target);display:grid;place-items:center;border-radius:var(--radius-round)}
+.nav-icon{position:relative}
+.nav-unread-dot{position:absolute;top:0;right:var(--space-2);width:var(--space-2);height:var(--space-2);border-radius:var(--radius-round);background:var(--color-text);outline:2px solid var(--color-navigation)}
+.ambient-nav-item[aria-current=page] .nav-icon{background:var(--color-selected)}
+.checkin-preview{position:absolute;inset:0;z-index:2}
+[data-page=journal] .checkin-preview{display:none}
+[data-page=checkin] .journal-content,[data-page=checkin] .memory-surface,[data-page=checkin] .memory-launch,[data-page=checkin] .secondary-veil{display:none}
+.memory-surface{position:absolute;z-index:8;top:var(--space-6);right:var(--gap-page);width:var(--size-target);height:var(--size-target);border-radius:var(--radius-sheet);background:var(--color-modal);color:var(--color-text);overflow:hidden;box-shadow:0 2px 8px #344e6514}
+.memory-launch{position:absolute;top:var(--space-6);right:var(--gap-page);width:var(--size-target);height:var(--size-target);z-index:9;background:none}
+.memory-toggle-icon{position:absolute;inset:0;display:grid;place-items:center;transition:opacity var(--motion-quick) ease,transform var(--motion-quick) var(--motion-easing)}
+.memory-toggle-icon[data-glyph=close]{opacity:0;transform:rotate(-45deg) scale(.6)}
+.memory-launch[aria-expanded=true] [data-glyph=stack]{opacity:0;transform:rotate(45deg) scale(.6)}
+.memory-launch[aria-expanded=true] [data-glyph=close]{opacity:1;transform:none}
+.memory-content{width:var(--memory-width);min-height:0;padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);opacity:0;visibility:hidden;pointer-events:none;max-height:calc(var(--screen-height) - 12rem);overflow:auto}
+.memory-content h2{font:var(--type-heading);padding-right:var(--space-8)}
+.memory-date,.memory-source,.memory-fine-print{font:var(--type-caption);color:var(--color-muted)}
+.memory-date{margin-top:var(--space-1)}
+
+.memory-copy{display:flex;flex-direction:column;gap:var(--space-4);flex:1}
+.memory-observation{display:flex;flex-direction:column;gap:var(--space-2)}
+.memory-footer{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);margin-top:auto}
+.memory-footer .plain-button{padding-inline:0;margin-left:auto}
+.memory-rules{list-style:none;padding:0;display:flex;flex-direction:column;gap:var(--space-2)}
+.memory-rule{display:flex;align-items:center;gap:var(--space-4);min-height:var(--size-target);background:none;border:0;padding:0;width:100%;color:inherit;text-align:left}
+.memory-rule .history-mood{width:var(--size-mood);height:var(--size-mood);flex:none}
+.memory-rule-copy{min-width:0;display:flex;flex-direction:column;gap:var(--space-1)}
+.memory-rule-note{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.memory-surface[data-state=open]{left:var(--memory-open-inset);right:auto;top:var(--memory-open-inset);width:var(--memory-width);height:auto;box-shadow:var(--memory-elevation)}
+.memory-surface[data-state=open] .memory-content{visibility:visible;opacity:1;pointer-events:auto}
+
+.memory-surface[data-state=opening] .memory-content,.memory-surface[data-state=closing] .memory-content{visibility:visible}
+[data-variant=ai] #memory-rules-copy,[data-variant=rules] #memory-ai-copy{display:none}
+[data-memory-ready=false] #memory-note-copy,[data-memory-ready=false] #notification-ai-label{display:none}
+[data-memory-ready=true] #memory-ai-copy,[data-memory-ready=true] #memory-rules-copy{display:none}
+[data-variant=ai] #notification-rule-highlight,[data-variant=rules] #notification-ai-highlight,[data-variant=rules] #notification-ai-label{display:none}</style><style>
+#notification-ai-highlight{display:flex;flex-direction:column;gap:var(--space-1)}
+.history-dialog{margin:auto;padding:var(--space-6);width:calc(100% - 2 * var(--gap-page));max-width:var(--size-dialog-max);max-height:calc(100svh - 2 * var(--gap-page));overflow:auto;border:0;border-radius:var(--radius-sheet);background:var(--color-modal);color:var(--color-text);font:var(--type-body)}
+.history-dialog::backdrop{background:#18152655}
+.history-dialog header{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-6)}
+.history-dialog h2{font:var(--type-heading)}
+[hidden]{display:none!important}
+.motion-layout{--screen-height:844px;background:#e8edf0;padding:var(--space-6);display:grid;grid-template-columns:390px minmax(0,1fr);gap:var(--space-8);align-items:start;min-height:100vh}
+.motion-layout .screen{border-radius:var(--radius-sheet)}
+.motion-controls{display:flex;flex-direction:column;gap:var(--space-4);padding-top:var(--space-4)}
+.scenario-controls{display:flex;flex-direction:column;gap:var(--space-2)}
+.scenario-controls select{min-height:var(--size-target);padding:var(--space-2);border-radius:var(--radius-field);border:1px solid var(--color-border);font:var(--type-body);color:inherit;background:var(--color-modal);width:100%}
+.motion-controls h1{font:var(--type-heading)}
+.motion-controls p,.motion-controls label{font:var(--type-body)}
+.motion-controls small{font:var(--type-caption);color:var(--color-muted)}
+.motion-buttons{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.motion-controls button{font:var(--type-body);min-height:var(--size-target);border:1px solid var(--color-border);border-radius:var(--radius-field);padding:var(--space-2) var(--space-4);background:var(--color-modal);color:inherit}
+.motion-controls button[aria-pressed=true]{background:var(--color-selected)}
+.motion-controls hr{border:0;border-top:1px solid var(--color-border)}
+@media(max-width:350px){.journal-content{gap:var(--space-6)}.recent-caption{flex-wrap:wrap;gap:var(--space-1)}.memory-content{padding:var(--space-4);min-height:0}.memory-rule{gap:var(--space-2)}}
+@media(prefers-reduced-motion:reduce){.ambient-shape,.cloud-veil{animation:none!important}.memory-toggle-icon{transition:none!important}}
+</style><style id="shared-control-shapes">
+:root{--radius-checkbox:calc(var(--radius-field) / 4); --radius-nav-selection:calc(var(--radius-field) / 2);--size-checkbox:1.125rem;--color-on-checkbox:#fff;}
+[data-appearance=night]{--color-on-checkbox:#302d43;}
+.ambient-nav-icon-slot,.nav-icon{border-radius:var(--radius-nav-selection)}
+</style>
+<!-- Source: Doop Mood Tracker, Journal notification · 02 · Enter / Opens and clears dot (TA9YhF-hPP).
+     The portfolio starts in Journal with an unread memory and hides the app navbar. -->
+<style>
+@font-face {
+    font-family: Roboto;
+    src: url("roboto-latin.woff2") format("woff2");
+    font-weight: 400 500;
+    font-display: swap;
+}
+.journal-screen { --size-navigation: 0rem; }
+.journal-screen .ambient-navigation { display: none; }
+:root[data-appearance="day"] { color-scheme: light; }
+:root[data-appearance="night"] { color-scheme: dark; }
+[data-appearance="night"] .cloud-veil { display: none; }
+
+.journal-screen[data-unread="true"] .memory-launch::after {
+    content: "";
+    position: absolute;
+    inset-block-start: var(--space-2);
+    inset-inline-end: var(--space-2);
+    inline-size: var(--space-2);
+    block-size: var(--space-2);
+    border-radius: var(--radius-round);
+    background: var(--color-text);
+    outline: 2px solid var(--color-modal);
+    pointer-events: none;
+}
+</style>
+<script>
+(() => {
+    const root = document.documentElement;
+    const host = window.parent.document.documentElement;
+    const system = matchMedia("(prefers-color-scheme: dark)");
+
+    function syncAppearance() {
+        const theme = host.dataset.theme;
+        const dark = theme === "dark" || (!theme && system.matches);
+        root.dataset.appearance = dark ? "night" : "day";
+    }
+
+    syncAppearance();
+    new MutationObserver(syncAppearance).observe(host, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+    });
+    system.addEventListener("change", syncAppearance);
+})();
+</script>
+</head><body><main class="screen journal-screen" id="journal-screen" data-variant="ai" data-page="journal" data-memory-ready="true" data-unread="true" data-seen="false" data-dismissed="false">
+<div class="ambient-background" id="ambient-background" aria-hidden="true"><i class="ambient-shape" id="ambient-shape-one"></i><i class="ambient-shape" id="ambient-shape-two"></i><i class="ambient-shape" id="ambient-shape-three"></i><div class="cloud-veil" id="drifting-cloud-veil" aria-hidden="true"><i class="cloud-puff" id="puff-west"></i><i class="cloud-puff" id="puff-east"></i><i class="cloud-puff" id="puff-south"></i></div></div><div class="secondary-veil" id="secondary-screen-veil" aria-hidden="true"></div>
+
+<section class="checkin-preview" id="notification-checkin" aria-label="Check-in preview"><section class="mood-orbit" id="mood-orbit" data-open="false" aria-label="Add a mood"><div class="orbit-anchor" id="orbit-anchor"><div class="mood-arc" id="mood-arc" role="group" aria-label="Moods, happy to unhappy" inert><button class="mood-option" id="mood-great" type="button" aria-label="Great" aria-pressed="false" data-mood="5" style="--mood-fill:var(--choice-great);--orbit-x:-128px;--compact-x:-112;--orbit-y:-64px;--delay:0ms"><span class="mood-swatch" aria-hidden="true"></span><span class="mood-label" aria-hidden="true">Great</span></button><button class="mood-option" id="mood-good" type="button" aria-label="Good" aria-pressed="false" data-mood="4" style="--mood-fill:var(--choice-good);--orbit-x:-64px;--compact-x:-56;--orbit-y:-96px;--delay:32ms"><span class="mood-swatch" aria-hidden="true"></span><span class="mood-label" aria-hidden="true">Good</span></button><button class="mood-option" id="mood-okay" type="button" aria-label="Okay" aria-pressed="false" data-mood="3" style="--mood-fill:var(--choice-okay);--orbit-x:0px;--compact-x:0;--orbit-y:-112px;--delay:64ms"><span class="mood-swatch" aria-hidden="true"></span><span class="mood-label" aria-hidden="true">Okay</span></button><button class="mood-option" id="mood-low" type="button" aria-label="Low" aria-pressed="false" data-mood="2" style="--mood-fill:var(--choice-low);--orbit-x:64px;--compact-x:56;--orbit-y:-96px;--delay:96ms"><span class="mood-swatch" aria-hidden="true"></span><span class="mood-label" aria-hidden="true">Low</span></button><button class="mood-option" id="mood-very-low" type="button" aria-label="Very low" aria-pressed="false" data-mood="1" style="--mood-fill:var(--choice-very-low);--orbit-x:128px;--compact-x:112;--orbit-y:-64px;--delay:128ms"><span class="mood-swatch" aria-hidden="true"></span><span class="mood-label" aria-hidden="true">Very low</span></button></div><span class="send-ring" id="send-ring" aria-hidden="true"></span><button class="mood-trigger" id="add-mood" type="button" aria-label="Add mood" aria-expanded="false" aria-controls="mood-arc"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d=""/></svg></button><span class="orbit-caption" id="orbit-caption" aria-hidden="true">Add mood</span><p class="mood-status" id="mood-status" role="status" aria-live="polite"></p></div></section>
+</section>
+<div class="journal-content" id="journal-content">
+<section class="recent-moods" id="recent-moods" aria-labelledby="recent-title"><h2 id="recent-title">Your last 14 days</h2><div class="distribution" role="img" aria-label="18 check-ins: 4 Great, 8 Good, 4 Okay, 1 Low, 1 Very low. Best to worst, left to right."><span style="--count:4;--mood-fill:var(--choice-great)" title="Great: 4 check-ins"></span><span style="--count:8;--mood-fill:var(--choice-good)" title="Good: 8 check-ins"></span><span style="--count:4;--mood-fill:var(--choice-okay)" title="Okay: 4 check-ins"></span><span style="--count:1;--mood-fill:var(--choice-low)" title="Low: 1 check-ins"></span><span style="--count:1;--mood-fill:var(--choice-very-low)" title="Very-Low: 1 check-ins"></span></div><p class="recent-caption"><span>18 check-ins across 11 days</span><span>12–25 October</span></p></section>
+<section class="journal-stream" id="journal-stream" aria-labelledby="stream-title"><div class="journal-note-search" id="journal-note-search"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></g></svg><input id="journal-note-query" type="text" inputmode="search" enterkeyhint="search" role="searchbox" aria-label="Search notes" placeholder="Search notes" autocomplete="off" disabled><button id="journal-search-clear" class="icon-button journal-search-clear" type="button" aria-label="Clear search" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div><header class="stream-heading"><h2 id="stream-title">October 2026</h2></header><div class="stream-scroll edge-fade" id="journal-scroll" tabindex="0" aria-label="Journal stream"><p id="journal-search-status" role="status"></p><ol class="stream-list" id="stream-list"><li><article class="history-entry" id="recent-0" aria-label="25 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2026<span class="caption"> · 17:40</span></h3></header><p class="entry-note-text two-line-text" title="Walked home along the river before it got dark.">Walked home along the river before it got dark.</p></div></article></li><li><article class="history-entry" id="recent-1" aria-label="25 Oct 2026, Great"><span class="history-mood" role="img" aria-label="Great" style="--mood-fill:var(--choice-great)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2026<span class="caption"> · 09:10</span></h3></header><p class="entry-note-text two-line-text" title="Coffee by the window while the rain came down.">Coffee by the window while the rain came down.</p></div></article></li><li><article class="history-entry" id="recent-2" aria-label="24 Oct 2026, Great"><span class="history-mood" role="img" aria-label="Great" style="--mood-fill:var(--choice-great)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">24 Oct 2026<span class="caption"> · 19:10</span></h3></header><p class="entry-note-text two-line-text" title="Made pizza with friends and stayed up talking.">Made pizza with friends and stayed up talking.</p></div></article></li><li><article class="history-entry" id="recent-3" aria-label="24 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">24 Oct 2026<span class="caption"> · 08:20</span></h3></header></div></article></li><li><article class="history-entry" id="recent-4" aria-label="23 Oct 2026, Okay"><span class="history-mood" role="img" aria-label="Okay" style="--mood-fill:var(--choice-okay)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">23 Oct 2026<span class="caption"> · 18:25</span></h3></header><p class="entry-note-text two-line-text" title="A busy day. Made soup and went to bed early.">A busy day. Made soup and went to bed early.</p></div></article></li><li><article class="history-entry" id="recent-5" aria-label="22 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">22 Oct 2026<span class="caption"> · 16:20</span></h3></header></div></article></li><li><article class="history-entry" id="recent-6" aria-label="22 Oct 2026, Low"><span class="history-mood" role="img" aria-label="Low" style="--mood-fill:var(--choice-low)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">22 Oct 2026<span class="caption"> · 08:10</span></h3></header><p class="entry-note-text two-line-text" title="Slept badly and rushed out without breakfast.">Slept badly and rushed out without breakfast.</p></div></article></li><li><article class="history-entry" id="recent-7" aria-label="21 Oct 2026, Okay"><span class="history-mood" role="img" aria-label="Okay" style="--mood-fill:var(--choice-okay)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">21 Oct 2026<span class="caption"> · 21:05</span></h3></header></div></article></li><li><article class="history-entry" id="recent-8" aria-label="20 Oct 2026, Great"><span class="history-mood" role="img" aria-label="Great" style="--mood-fill:var(--choice-great)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">20 Oct 2026<span class="caption"> · 19:00</span></h3></header><p class="entry-note-text two-line-text" title="Rode my bike to the coast and caught the sunset.">Rode my bike to the coast and caught the sunset.</p></div></article></li><li><article class="history-entry" id="recent-9" aria-label="20 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">20 Oct 2026<span class="caption"> · 08:00</span></h3></header></div></article></li><li><article class="history-entry" id="recent-10" aria-label="19 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">19 Oct 2026<span class="caption"> · 19:10</span></h3></header><p class="entry-note-text two-line-text" title="Called my sister on the way home.">Called my sister on the way home.</p></div></article></li><li><article class="history-entry" id="recent-11" aria-label="18 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">18 Oct 2026<span class="caption"> · 20:00</span></h3></header></div></article></li><li><article class="history-entry" id="recent-12" aria-label="18 Oct 2026, Okay"><span class="history-mood" role="img" aria-label="Okay" style="--mood-fill:var(--choice-okay)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">18 Oct 2026<span class="caption"> · 09:00</span></h3></header></div></article></li><li><article class="history-entry" id="recent-13" aria-label="17 Oct 2026, Very Low"><span class="history-mood" role="img" aria-label="Very Low" style="--mood-fill:var(--choice-very-low)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">17 Oct 2026<span class="caption"> · 20:10</span></h3></header><p class="entry-note-text two-line-text" title="Everything felt heavy today. Put on a familiar film.">Everything felt heavy today. Put on a familiar film.</p></div></article></li><li><article class="history-entry" id="recent-14" aria-label="16 Oct 2026, Great"><span class="history-mood" role="img" aria-label="Great" style="--mood-fill:var(--choice-great)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">16 Oct 2026<span class="caption"> · 18:00</span></h3></header></div></article></li><li><article class="history-entry" id="recent-15" aria-label="16 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">16 Oct 2026<span class="caption"> · 08:00</span></h3></header></div></article></li><li><article class="history-entry" id="recent-16" aria-label="15 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">15 Oct 2026<span class="caption"> · 19:00</span></h3></header></div></article></li><li><article class="history-entry" id="recent-17" aria-label="15 Oct 2026, Okay"><span class="history-mood" role="img" aria-label="Okay" style="--mood-fill:var(--choice-okay)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">15 Oct 2026<span class="caption"> · 08:00</span></h3></header><p class="entry-note-text two-line-text" title="Picked up groceries and finally folded the laundry.">Picked up groceries and finally folded the laundry.</p></div></article></li></ol></div></section>
+</div><nav class="ambient-navigation" id="primary-navigation" aria-label="Primary navigation"><button class="ambient-nav-item" type="button" data-destination="checkin" aria-label="Check in" ><span class="nav-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8m-4-4v8"/></g></svg></span><span class="ambient-nav-label">Check in</span></button><button class="ambient-nav-item" type="button" data-destination="journal" aria-label="Journal" aria-current=page><span class="nav-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v16m8.001-2A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2a5 5 0 0 1 4-2z"/></svg><span class="nav-unread-dot" id="journal-unread-dot" aria-hidden="true" hidden></span></span><span class="ambient-nav-label">Journal</span></button><button class="ambient-nav-item" type="button" data-destination="insights" aria-label="Insights" ><span class="nav-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v5m4-6.361V21m4-10.344V21m2-18l-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15m2 3.463V21m4-6.344V21"/></svg></span><span class="ambient-nav-label">Insights</span></button><button class="ambient-nav-item" type="button" data-destination="settings" aria-label="Settings" ><span class="nav-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0a2.34 2.34 0 0 0 3.319 1.915a2.34 2.34 0 0 1 2.33 4.033a2.34 2.34 0 0 0 0 3.831a2.34 2.34 0 0 1-2.33 4.033a2.34 2.34 0 0 0-3.319 1.915a2.34 2.34 0 0 1-4.659 0a2.34 2.34 0 0 0-3.32-1.915a2.34 2.34 0 0 1-2.33-4.033a2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></g></svg></span><span class="ambient-nav-label">Settings</span></button></nav>
+<section class="memory-surface" id="memory-surface" data-state="closed">
+<div class="memory-content" id="memory-content">
+<header id="memory-heading"><h2 id="memory-title">On this day</h2><p class="memory-date">25 October</p></header>
+<div class="memory-copy" id="memory-ai-copy"><p class="two-line-text" id="memory-app-summary">This date has generally been a good day in past years.</p></div>
+<div class="memory-copy" id="memory-rules-copy"><ol class="memory-rules"><li><button class="memory-rule" type="button" data-show-history><span class="history-mood" style="--mood-fill:var(--choice-good)" role="img" aria-label="Good"></span><span class="memory-rule-copy"><span class="memory-source">2025</span><span class="memory-rule-note">Good</span></span></button></li><li><button class="memory-rule" type="button" data-show-history><span class="history-mood" style="--mood-fill:var(--choice-great)" role="img" aria-label="Great"></span><span class="memory-rule-copy"><span class="memory-source">2024</span><span class="memory-rule-note">Great</span></span></button></li><li><button class="memory-rule" type="button" data-show-history><span class="history-mood" style="--mood-fill:var(--choice-okay)" role="img" aria-label="Okay"></span><span class="memory-rule-copy"><span class="memory-source">2023</span><span class="memory-rule-note">Okay</span></span></button></li></ol></div>
+<div class="memory-copy" id="memory-note-copy"><div id="notification-ai-highlight"><p class="two-line-text">A quiet walk through the park helped me feel settled.</p><p class="memory-source">2025 · 1 check-in</p></div><div id="notification-rule-highlight"><article class="history-entry" id="notification-note-preview" aria-label="25 October 2025, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 October 2025</h3></header><p class="entry-note-text two-line-text" title="A quiet walk through the park helped me feel settled.">A quiet walk through the park helped me feel settled.</p></div></article></div></div>
+<footer class="memory-footer"><small class="memory-fine-print" id="notification-ai-label">AI</small></footer></div></section>
+<button class="icon-button memory-launch" id="memory-launch" type="button" aria-label="Open On this day, unread memory" aria-controls="memory-content" aria-expanded="false"><span class="memory-toggle-icon" data-glyph="stack"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M7 2h10M5 6h14"/><rect width="18" height="12" x="3" y="10" rx="2"/></g></svg></span><span class="memory-toggle-icon" data-glyph="close"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></span></button>
+</main>
+<dialog class="history-dialog" id="date-history" aria-labelledby="date-history-title"><header><h2 id="date-history-title">On this day · All check-ins</h2><button class="icon-button" id="history-dismiss" type="button" aria-label="Close date history"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></button></header><ol class="memory-entries"><li><article class="history-entry" id="anniversary-0" aria-label="25 Oct 2026, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2026<span class="caption"> · 17:40</span></h3></header></div></article></li><li><article class="history-entry" id="anniversary-1" aria-label="25 Oct 2026, Great"><span class="history-mood" role="img" aria-label="Great" style="--mood-fill:var(--choice-great)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2026<span class="caption"> · 09:10</span></h3></header></div></article></li><li><article class="history-entry" id="anniversary-2" data-search-archive aria-label="25 Oct 2025, Good"><span class="history-mood" role="img" aria-label="Good" style="--mood-fill:var(--choice-good)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2025<span class="caption"> · 18:10</span></h3></header><p class="entry-note-text two-line-text" title="A quiet walk through the park helped me feel settled.">A quiet walk through the park helped me feel settled.</p></div></article></li><li><article class="history-entry" id="anniversary-3" data-search-archive aria-label="25 Oct 2025, Okay"><span class="history-mood" role="img" aria-label="Okay" style="--mood-fill:var(--choice-okay)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2025<span class="caption"> · 09:15</span></h3></header></div></article></li><li><article class="history-entry" id="anniversary-4" data-search-archive aria-label="25 Oct 2024, Great"><span class="history-mood" role="img" aria-label="Great" style="--mood-fill:var(--choice-great)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2024<span class="caption"> · 20:30</span></h3></header></div></article></li><li><article class="history-entry" id="anniversary-5" aria-label="25 Oct 2023, Okay"><span class="history-mood" role="img" aria-label="Okay" style="--mood-fill:var(--choice-okay)"></span><div class="entry-content"><header class="history-entry-heading"><h3 class="entry-title">25 Oct 2023<span class="caption"> · 17:00</span></h3></header></div></article></li></ol></dialog><script>/* One real container changes bounds: no scaled text or separate flying copy. */
+(() => {
+  const screen = document.querySelector('#journal-screen');
+  const surface = document.querySelector('#memory-surface');
+  const content = document.querySelector('#memory-content');
+  const launch = document.querySelector('#memory-launch');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let busy = false, slow = false;
+  const journalTab = document.querySelector('[data-destination=journal]');
+  const checkinTab = document.querySelector('[data-destination=checkin]');
+  const dot = document.querySelector('#journal-unread-dot');
+  let ready = screen.dataset.memoryReady === 'true';
+  let seen = screen.dataset.seen === 'true';
+  let dismissed = screen.dataset.dismissed === 'true';
+  function updateBadge() {
+    const unread = ready && !seen && !dismissed;
+    screen.dataset.unread = String(unread);
+    dot.hidden = !unread;
+    journalTab.setAttribute('aria-label', unread ? 'Journal, unread memory' : 'Journal');
+  }
+  function showPage(page, automatic = true) {
+    screen.dataset.page = page;
+    document.querySelectorAll('[data-destination]').forEach(tab => {
+      if (tab.dataset.destination === page) tab.setAttribute('aria-current', 'page');
+      else tab.removeAttribute('aria-current');
+    });
+    if (automatic && page === 'journal' && ready && !seen && !dismissed) transform(true);
+  }
+  const state = () => surface.dataset.state;
+  function size() {
+    const gutter = parseFloat(getComputedStyle(screen).getPropertyValue('--memory-open-inset')) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    screen.style.setProperty('--memory-width', `${screen.clientWidth - gutter * 2}px`);
+  }
+  size();
+  new ResizeObserver(size).observe(screen);
+  const properties = ['left', 'top', 'width', 'height', 'borderRadius', 'boxShadow'];
+  function snapshot() {
+    const style = getComputedStyle(surface);
+    return Object.fromEntries(properties.map(key => [key, style[key]]));
+  }
+  async function transform(open, immediate = false) {
+    if (busy || (open ? state() === 'open' : state() === 'closed')) return;
+    busy = true;
+    if (ready) {
+      if (open) { seen = true; screen.dataset.seen = 'true'; }
+      else { dismissed = true; screen.dataset.dismissed = 'true'; }
+      updateBadge();
+    }
+    const from = snapshot();
+    surface.dataset.state = open ? 'open' : 'closed';
+    const to = snapshot();
+    const duration = reduced.matches || immediate ? 0 : slow ? 1920 : 480;
+    const easing = 'cubic-bezier(.22,.8,.22,1)';
+    launch.setAttribute('aria-expanded', String(open));
+    launch.setAttribute('aria-label', open ? 'Close On this day' : 'Open On this day');
+    if (open) {
+      surface.setAttribute('role', 'dialog');
+      surface.setAttribute('aria-labelledby', 'memory-title');
+      content.inert = false;
+    }
+    if (duration) {
+      surface.dataset.state = open ? 'opening' : 'closing';
+      const containerAnimation = surface.animate([from, to], { duration, easing, fill: 'both' });
+      const textAnimation = content.animate(open
+        ? [{ opacity: 0 }, { opacity: 0, offset: .25 }, { opacity: 1 }]
+        : [{ opacity: 1 }, { opacity: 0, offset: .35 }, { opacity: 0 }], { duration, easing, fill: 'both' });
+      await containerAnimation.finished;
+      surface.dataset.state = open ? 'open' : 'closed';
+      containerAnimation.cancel(); textAnimation.cancel();
+    }
+    content.inert = !open;
+    if (!open) { surface.removeAttribute('role'); surface.removeAttribute('aria-labelledby'); }
+    busy = false;
+    launch.focus({ preventScroll: true });
+    const status = document.querySelector('#motion-status');
+    if (status) status.textContent = open ? 'Open · same container, expanded' : 'Closed · docked at upper right';
+  }
+  launch.addEventListener('click', () => transform(state() !== 'open'));
+  journalTab.addEventListener('click', () => showPage('journal'));
+  checkinTab.addEventListener('click', () => showPage('checkin'));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && state() === 'open' && !document.querySelector('dialog[open]')) transform(false);
+  });
+  content.inert = state() !== 'open';
+  if (state() === 'open') {
+    surface.setAttribute('role', 'dialog'); surface.setAttribute('aria-labelledby', 'memory-title');
+    launch.setAttribute('aria-expanded', 'true');
+    launch.setAttribute('aria-label', 'Close On this day');
+  }
+  updateBadge();
+  async function resetDay(nextReady = ready) {
+    if (busy) return;
+    await transform(false, true);
+    ready = nextReady; seen = false; dismissed = false;
+    screen.dataset.memoryReady = String(ready);
+    screen.dataset.seen = 'false'; screen.dataset.dismissed = 'false';
+    const fixtureNote = document.querySelector('#anniversary-2 .entry-note-text');
+    if (fixtureNote) fixtureNote.hidden = !ready;
+    updateBadge(); showPage('checkin');
+    const status = document.querySelector('#motion-status');
+    if (status) status.textContent = ready ? 'Unread memory · tap Journal' : 'Generic history · no dot or auto-opening';
+  }
+  document.querySelector('#notification-reset')?.addEventListener('click', () => resetDay());
+  document.querySelector('#notification-scenario')?.addEventListener('change', event => resetDay(event.target.value === 'note'));
+  // The Check-in surface is a visual reuse of the approved source, not journal persistence.
+  const orbit = document.querySelector('#mood-orbit');
+  const moodTrigger = document.querySelector('#add-mood');
+  moodTrigger.addEventListener('click', () => {
+    const open = orbit.dataset.open !== 'true'; orbit.dataset.open = String(open);
+    moodTrigger.setAttribute('aria-expanded', String(open)); document.querySelector('#mood-arc').inert = !open;
+  });
+  const history = document.querySelector('#date-history');
+  document.querySelectorAll('[data-show-history]').forEach(button => button.addEventListener('click', () => history.showModal()));
+  document.querySelector('#history-dismiss').addEventListener('click', () => history.close());
+  const scroller = document.querySelector('#journal-scroll');
+  const search = document.querySelector('#journal-note-query');
+  const clearSearch = document.querySelector('#journal-search-clear');
+  const stream = document.querySelector('#stream-list');
+  const streamTitle = document.querySelector('#stream-title');
+  const monthTitle = streamTitle.textContent;
+  const searchStatus = document.querySelector('#journal-search-status');
+
+  function noteWords(text) {
+    return text.normalize('NFD').replace(/\p{M}+/gu, '').toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
+  }
+
+  const recentEntries = Array.from(stream.children);
+  const archiveEntries = Array.from(history.querySelectorAll('[data-search-archive]'), entry => {
+    const copy = entry.cloneNode(true);
+    copy.id = `search-${entry.id}`;
+    const row = document.createElement('li');
+    row.append(copy);
+    return row;
+  });
+  const searchableEntries = [...recentEntries, ...archiveEntries].map(row => ({
+    row,
+    archive: archiveEntries.includes(row),
+    words: noteWords(row.querySelector('.entry-note-text')?.textContent ?? ''),
+  }));
+  stream.append(...archiveEntries);
+
+  function filterNotes() {
+    const active = search.value.trim() !== '';
+    const terms = noteWords(search.value).slice(0, 20);
+    let found = false;
+    for (const { row, archive, words } of searchableEntries) {
+      const matches = active
+        ? terms.length > 0 && terms.every(term => words.some(word => word.startsWith(term)))
+        : !archive;
+      row.hidden = !matches;
+      found ||= matches;
+    }
+    streamTitle.textContent = active ? 'Search results' : monthTitle;
+    clearSearch.hidden = search.value === '';
+    searchStatus.textContent = active && !found ? 'No notes match your search.' : '';
+    scroller.scrollTop = 0;
+    fade();
+  }
+
+  search.addEventListener('input', filterNotes);
+  clearSearch.addEventListener('click', () => {
+    search.value = '';
+    filterNotes();
+    search.focus();
+  });
+  search.disabled = false;
+
+  function fade() {
+    const remaining = Math.max(0, scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop);
+    scroller.style.setProperty('--edge-top', `${Math.min(24, scroller.scrollTop)}px`);
+    scroller.style.setProperty('--edge-bottom', `${Math.min(24, remaining)}px`);
+  }
+  scroller.addEventListener('scroll', fade, { passive: true });
+  new ResizeObserver(fade).observe(scroller); filterNotes();
+  document.querySelectorAll('[data-memory-mode]').forEach(button => button.addEventListener('click', () => {
+    screen.dataset.variant = button.dataset.memoryMode;
+    document.querySelectorAll('[data-memory-mode]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+  }));
+  document.querySelector('#motion-open')?.addEventListener('click', () => { showPage('journal', false); transform(true); });
+  document.querySelector('#motion-close')?.addEventListener('click', () => transform(false));
+  document.querySelector('#motion-slow')?.addEventListener('click', event => { slow = !slow; event.currentTarget.setAttribute('aria-pressed', String(slow)); });
+  document.querySelector('#motion-replay')?.addEventListener('click', async () => {
+    if (busy) return;
+    await transform(false, true); showPage('journal', false); await transform(true);
+    await new Promise(resolve => setTimeout(resolve, 900)); await transform(false);
+  });
+})();
+</script></body></html>

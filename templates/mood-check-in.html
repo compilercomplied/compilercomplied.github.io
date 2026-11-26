@@ -1,0 +1,31 @@
+<div class="check-in-demo">
+    <p class="check-in-demo-fallback">
+        <img src="{{ get_url(path="project-pages/mood-tracker/journal-orbit.png", cachebust=true) }}" width="390" height="844" loading="lazy" alt="The journal check-in screen with five mood choices above a satin disc.">
+    </p>
+    <div class="check-in-interactive" hidden>
+        <form class="mood-phone check-in-phone" data-phase="idle" aria-label="Mood check-in demo" autocomplete="off">
+            <div class="mood-phone-screen check-in-screen">
+                <div class="check-in-upper">
+                    <div id="check-in-choices" class="check-in-choices" role="group" aria-label="Choose a mood" inert>
+                        {% set moods = ["Great", "Good", "Okay", "Low", "Very low"] %}
+                        {% for mood in moods %}
+                        <button class="check-in-choice" type="button" aria-pressed="false">
+                            <span class="check-in-choice-dot" aria-hidden="true"></span>
+                            <span class="check-in-choice-label">{{ mood }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <div class="check-in-note" inert>
+                        <textarea id="check-in-demo-note" aria-label="Add a note (optional)" rows="2" placeholder="What would you like to remember about this moment?"></textarea>
+                    </div>
+                </div>
+                <div class="check-in-action">
+                    <span class="check-in-ring" aria-hidden="true"></span>
+                    <button class="check-in-disc" type="submit" aria-label="Add mood" aria-expanded="false" aria-controls="check-in-choices"></button>
+                    <span class="check-in-caption" aria-hidden="true">Add mood</span>
+                </div>
+                <p class="check-in-status" role="status"></p>
+            </div>
+        </form>
+    </div>
+</div>

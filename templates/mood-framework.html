@@ -1,0 +1,60 @@
+<section class="mood-framework" aria-labelledby="mood-framework-title">
+    <h2 id="mood-framework-title">A design framework built from the ground up</h2>
+    <div class="mood-framework-description">
+        {% for paragraph in page.extra.framework_intro %}
+        <p>{{ paragraph | markdown(inline=true) | safe }}</p>
+        {% endfor %}
+    </div>
+    <div class="mood-framework-body">
+        <div class="mood-framework-foundations">
+            <div class="mood-framework-group">
+                <h3>Palette</h3>
+                <ul class="mood-framework-moods" role="list">
+                    <li><span style="--swatch: var(--mood-great)"></span>Great</li>
+                    <li><span style="--swatch: var(--mood-good)"></span>Good</li>
+                    <li><span style="--swatch: var(--mood-okay)"></span>Okay</li>
+                    <li><span style="--swatch: var(--mood-low)"></span>Low</li>
+                    <li><span style="--swatch: var(--mood-very-low)"></span>Very low</li>
+                </ul>
+            </div>
+            <div class="mood-framework-group">
+                <h3>Motion</h3>
+                <dl class="mood-framework-motion">
+                    <div data-motion-mode="quick"><dt>Quick feedback</dt><dd>160 ms</dd></div>
+                    <div data-motion-mode="fade"><dt>Fade</dt><dd>320 ms</dd></div>
+                    <div data-motion-mode="movement"><dt>Movement</dt><dd>480 ms</dd></div>
+                </dl>
+                <div class="mood-motion-preview" data-motion="quick" data-paused hidden>
+                    <button class="mood-motion-track" type="button" aria-label="Play motion preview">
+                        <span class="mood-motion-playback-icon" aria-hidden="true"></span>
+                        <span class="mood-motion-rail" aria-hidden="true"><span class="mood-motion-runner"></span></span>
+                    </button>
+                    <button class="mood-filled-action mood-motion-mode" type="button">Quick feedback</button>
+                </div>
+            </div>
+        </div>
+        <div class="mood-framework-group">
+            <h3>Typography &amp; spacing</h3>
+            <div class="mood-framework-type">
+                <span>Journal</span>
+                <span>A quiet morning.</span>
+                <span>25 October · 17:40</span>
+            </div>
+            <ul class="mood-framework-spacing" role="list" aria-label="Spacing scale at the default text size, in pixels">
+                <li style="--step: .25rem">4</li>
+                <li style="--step: .5rem">8</li>
+                <li style="--step: 1rem">16</li>
+                <li style="--step: 1.5rem">24</li>
+                <li style="--step: 2rem">32</li>
+            </ul>
+        </div>
+        <div class="mood-framework-group">
+            <h3>Controls</h3>
+            <form class="mood-framework-controls">
+                <input class="mood-framework-field" type="text" aria-label="Example note" placeholder="Add a note…" autocomplete="off">
+                <button class="mood-filled-action" type="reset">Save</button>
+            </form>
+            <p class="mood-framework-caption">48 px minimum target · 16 px field and button corners</p>
+        </div>
+    </div>
+</section>

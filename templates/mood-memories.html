@@ -1,0 +1,11 @@
+<div class="mood-phone memory-phone">
+    <div class="mood-phone-screen">
+        {% set journal = get_url(path="project-pages/mood-tracker/journal-doop.html", cachebust=true) %}
+        <template class="memory-frame">
+            <iframe src="{{ journal }}" title="Journal demo with sample entries" loading="lazy"></iframe>
+        </template>
+        <noscript>
+            <iframe src="{{ journal }}" title="Journal demo with sample entries" loading="lazy"></iframe>
+        </noscript>
+    </div>
+</div>

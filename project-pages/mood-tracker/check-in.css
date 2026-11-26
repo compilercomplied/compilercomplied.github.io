@@ -1,0 +1,254 @@
+.check-in-demo {
+    min-inline-size: 0;
+    text-align: center;
+}
+
+.check-in-demo-fallback img {
+    inline-size: min(100%, 21rem);
+    display: block;
+    block-size: auto;
+    border-radius: var(--mood-radius);
+}
+
+/* Adapted from the Doop day/night Check-in screens and mood-orbit recipe. */
+.check-in-phone {
+    --check-in-disc: 5rem;
+    --check-in-rotate: 960ms;
+    --check-in-ring-duration: 640ms;
+    --check-in-metal: light-dark(#f2dbc5, #e1dbe8), light-dark(#e7c2aa, #e8d0ce) 32%,
+        light-dark(#d7b6b7, #ecd4b8) 64%, light-dark(#dfc7b6, #d7ccdf);
+}
+
+.check-in-screen {
+    display: grid;
+    grid-template-rows: minmax(14.5rem, auto) auto minmax(13.5rem, auto);
+    padding-block-start: 3.35rem;
+}
+
+.check-in-upper {
+    position: relative;
+    display: grid;
+    align-items: end;
+    padding: 0 1rem 1.25rem;
+}
+
+.check-in-choice {
+    --check-in-choice-target: min(var(--mood-target), 18cqi);
+    --orbit-step: clamp(0rem, calc((100cqi - var(--check-in-choice-target) - .875rem) / 4), 4rem);
+    position: absolute;
+    z-index: 2;
+    inset-inline-start: 50%;
+    inset-block-start: calc(100% + var(--check-in-disc) / 2);
+    margin: calc(var(--check-in-choice-target) / -2);
+    inline-size: var(--check-in-choice-target);
+    min-block-size: var(--check-in-choice-target);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--mood-text);
+    font: inherit;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(.25);
+    transition: transform var(--mood-move) var(--mood-easing), opacity var(--mood-quick) ease, visibility 0s var(--mood-move);
+}
+
+.check-in-choice:nth-child(1) {
+    --orbit-index: -2;
+    --orbit-rise: -4rem;
+    --orbit-delay: 0ms;
+    --choice-color: var(--mood-great);
+}
+
+.check-in-choice:nth-child(2) {
+    --orbit-index: -1;
+    --orbit-rise: -6rem;
+    --orbit-delay: 32ms;
+    --choice-color: var(--mood-good);
+}
+
+.check-in-choice:nth-child(3) {
+    --orbit-index: 0;
+    --orbit-rise: -7rem;
+    --orbit-delay: 64ms;
+    --choice-color: var(--mood-okay);
+}
+
+.check-in-choice:nth-child(4) {
+    --orbit-index: 1;
+    --orbit-rise: -6rem;
+    --orbit-delay: 96ms;
+    --choice-color: var(--mood-low);
+}
+
+.check-in-choice:nth-child(5) {
+    --orbit-index: 2;
+    --orbit-rise: -4rem;
+    --orbit-delay: 128ms;
+    --choice-color: var(--mood-very-low);
+}
+
+.check-in-phone[data-phase="choose"] .check-in-choice {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(calc(var(--orbit-step) * var(--orbit-index)), var(--orbit-rise));
+    transition-delay: var(--orbit-delay), var(--orbit-delay), 0s;
+}
+
+.check-in-phone:is([data-phase="entry"], [data-phase="confirm"]) .check-in-choice[aria-pressed="true"] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-12.5rem);
+    transition-delay: 0s;
+}
+
+.check-in-choice-dot {
+    inline-size: min(2.5rem, 13cqi);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--choice-color);
+    transition: transform var(--mood-quick) ease;
+}
+
+.check-in-choice:is(:hover, [aria-pressed="true"]) .check-in-choice-dot {
+    transform: scale(1.15);
+}
+
+.check-in-choice-label {
+    position: absolute;
+    inline-size: max-content;
+    inset-block-start: calc(100% + .25rem);
+    opacity: 0;
+    font-size: .75rem;
+    pointer-events: none;
+}
+
+.check-in-choice:is(:hover, :focus-visible, [aria-pressed="true"]) .check-in-choice-label {
+    opacity: 1;
+}
+
+.check-in-choice[aria-pressed="true"] .check-in-choice-label {
+    inset-block-start: auto;
+    inset-block-end: calc(100% + .125rem);
+}
+
+.check-in-note {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--mood-fade) ease, visibility 0s var(--mood-fade);
+}
+
+.check-in-phone:is([data-phase="entry"], [data-phase="confirm"]) .check-in-note {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: var(--mood-move), 0s;
+}
+
+.check-in-note textarea {
+    display: block;
+    min-block-size: 5rem;
+    inline-size: 100%;
+    padding: .75rem 1rem;
+    resize: none;
+    border: 1px solid var(--mood-border);
+    border-radius: var(--mood-radius);
+    background: var(--mood-field);
+    color: inherit;
+    font: inherit;
+}
+
+.check-in-note textarea::placeholder {
+    color: var(--mood-muted);
+    opacity: 1;
+}
+
+.check-in-action {
+    position: relative;
+    inline-size: var(--check-in-disc);
+    margin-inline: auto;
+}
+
+.check-in-disc {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    display: block;
+    padding: 0;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid #ffffff24;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: inset 0 1px 7px #fff6e52e, 0 7px 28px #4e60752b;
+    cursor: pointer;
+}
+
+.check-in-disc::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 32% 22%, #fff9ef55, transparent 78%),
+        linear-gradient(145deg, var(--check-in-metal));
+    transform: rotate(var(--check-in-turn, 0deg));
+    transition: transform var(--check-in-rotate) cubic-bezier(.22, .65, .25, 1);
+}
+
+.check-in-disc:active {
+    scale: .96;
+}
+
+.check-in-choice,
+.check-in-disc {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.check-in-ring {
+    position: absolute;
+    inset: -.25rem;
+    pointer-events: none;
+    border: 2px solid light-dark(#e2c3b5, #e5d3cf);
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.check-in-phone[data-phase="confirm"] .check-in-ring {
+    animation: check-in-confirm var(--check-in-ring-duration) ease-out;
+}
+
+@keyframes check-in-confirm {
+    25% { opacity: .9; }
+    to { opacity: 0; transform: scale(1.65); }
+}
+
+.check-in-caption {
+    position: absolute;
+    inset-block-start: calc(100% + .5rem);
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    inline-size: max-content;
+    color: var(--mood-muted);
+    font-size: .8125rem;
+}
+
+.check-in-status {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .check-in-choice, .check-in-choice-dot, .check-in-note, .check-in-disc::before {
+        transition: none;
+    }
+
+    .check-in-phone[data-phase="confirm"] .check-in-ring {
+        animation: none;
+    }
+}

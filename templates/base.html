@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{{ config.title }}{% endblock title %}</title>
     <script src="{{ get_url(path="theme.js", cachebust=true) }}"></script>
+    <script src="{{ get_url(path="navigation.js", cachebust=true) }}" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
@@ -17,9 +18,10 @@
         <header class="site-header">
             <nav class="nav-container site-nav" aria-label="Site navigation">
                 <div class="nav-links">
-                    <a class="nav-home" href="{{ get_url(path="/") }}">home</a>
+                    <a class="nav-link" href="{{ get_url(path="/") }}"{% if current_path == "/" %} aria-current="page"{% endif %}>home</a>
+                    <a class="nav-link" href="{{ get_url(path="@/projects.md") }}"{% if current_path == "/projects/" %} aria-current="page"{% elif current_path == "/projects/mood-tracker/" %} aria-current="location"{% endif %}>projects</a>
                     {% if blog.pages | length > 0 %}
-                    <a class="nav-home" href="{{ blog.permalink }}">blog</a>
+                    <a class="nav-link" href="{{ blog.permalink }}"{% if current_path == blog.path %} aria-current="page"{% endif %}>blog</a>
                     {% endif %}
                 </div>
                 <svg class="theme-symbols" width="0" height="0" aria-hidden="true" focusable="false">
@@ -57,6 +59,7 @@
                     {% endfor %}
                 </button>
             </nav>
+            {% block header_end %}{% endblock header_end %}
         </header>
         {% block content %}{% endblock content %}
     </div>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block site_class %} projects-page{% endblock site_class %}
+
+{% block styles %}
+<noscript><style>@view-transition { navigation: none; }</style></noscript>
+<script src="{{ get_url(path="project-background.js", cachebust=true) }}" data-from="{{ get_url(path="@/mood-tracker.md") }}" data-project-list></script>
+{% endblock styles %}
+
+{% block content %}
+<main class="reading-main projects-main" aria-label="{{ page.title }}">
+    <ul class="projects-list" role="list">
+        {% for project in page.extra.projects %}
+        {% set detail = get_page(path=project.page) %}
+        <li class="project-item">
+            <img class="project-image" src="{{ get_url(path=detail.extra.image, cachebust=true) }}" width="{{ detail.extra.image_size }}" height="{{ detail.extra.image_size }}" alt="">
+            <div class="project-details">
+                <h2><a class="project-title" href="{{ detail.permalink }}">{{ detail.title }}</a></h2>
+                {% for paragraph in detail.extra.intro %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
+                <p class="project-store"><a href="{{ detail.extra.store_url }}">Google Play</a></p>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</main>
+{% endblock content %}

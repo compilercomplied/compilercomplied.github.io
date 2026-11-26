@@ -34,6 +34,15 @@
     --stroke-focus: 2px;
     --control-min: 2.75rem;
     --layout-inset: calc(var(--gap-group) + var(--gap-tight));
+    --header-gutter: var(--gap-group);
+    --navigation-inset-start: var(--layout-inset);
+    --navigation-inset-end: var(--gap-default);
+    --navigation-slot-width: calc(6 * var(--text-ui));
+    --projects-top-space: calc(2 * var(--gap-section));
+    --project-background-duration: 180ms;
+    --project-thumbnail-size: calc(var(--gap-section) + var(--gap-default));
+    --project-thumbnail-offset: .8125rem;
+    --project-back-bar-size: calc(3rem + 2 * var(--gap-tight));
 }
 
 :root[data-theme="light"],
@@ -71,7 +80,7 @@ body, .site {
 }
 
 body > header, .site-header {
-    padding: var(--layout-inset) var(--gap-group) 0;
+    padding: var(--layout-inset) var(--header-gutter) 0;
 }
 
 .nav-container {
@@ -102,17 +111,89 @@ body > header, .site-header {
     inset-block-end: 0;
 }
 
-.nav-home {
+.nav-link {
+    position: relative;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    inline-size: min(100%, var(--navigation-slot-width));
     min-block-size: var(--control-min);
+    padding-inline: var(--gap-tight);
     color: inherit;
     font-size: var(--text-ui);
     letter-spacing: .035em;
     text-decoration: none;
 }
 
-.nav-home:hover {
+.nav-link:is([aria-current="page"], [aria-current="location"])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-selected);
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
+
+    .site-header {
+        view-transition-name: site-header;
+    }
+
+    ::view-transition {
+        pointer-events: none;
+    }
+
+    ::view-transition-group(root),
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 160ms;
+        animation-timing-function: ease-out;
+    }
+
+    ::view-transition-group(site-header),
+    ::view-transition-new(site-header) {
+        animation: none;
+    }
+
+    ::view-transition-old(site-header) {
+        display: none;
+    }
+
+    .nav-link[data-selection-motion]::before {
+        animation: nav-selection-click 160ms both;
+    }
+
+    :root[data-content-entering] .site > :is(main, .background-art) {
+        animation: site-content-enter 160ms ease-out both;
+    }
+}
+
+@keyframes site-content-enter {
+    from { opacity: .25; }
+    to { opacity: 1; }
+}
+
+@keyframes nav-selection-click {
+    from {
+        transform: translate(var(--selection-offset-x), var(--selection-offset-y));
+        animation-timing-function: cubic-bezier(.25, .7, .35, 1);
+    }
+
+    78% {
+        transform: translate(var(--selection-overtravel), 1px) scaleY(.97);
+        animation-timing-function: ease-out;
+    }
+
+    to {
+        transform: none;
+    }
+}
+
+.nav-link:hover {
     color: var(--color-action);
     text-decoration: underline;
     text-underline-offset: .25em;
@@ -122,13 +203,14 @@ body > header, .site-header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: var(--gap-tight);
-    padding-inline-end: var(--gap-default);
+    padding-inline: var(--navigation-inset-start) var(--navigation-inset-end);
 }
 
 .nav-links {
+    isolation: isolate;
     display: flex;
     flex-wrap: wrap;
-    gap: 0 var(--gap-group);
+    gap: 0 var(--gap-tight);
 }
 
 .theme-control {
@@ -313,6 +395,99 @@ body > main {
     font-size: var(--text-ui);
 }
 
+:is(.projects-page, .mood-tracker-page) > .site-header {
+    position: relative;
+    z-index: 1;
+}
+
+:is(.projects-page, .mood-tracker-page) > .site-header::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline: 0;
+    block-size: .75rem;
+    background: linear-gradient(to bottom, var(--color-canvas), transparent);
+    pointer-events: none;
+}
+
+.projects-page > .site-header {
+    padding-block-end: var(--project-back-bar-size);
+}
+
+.projects-main {
+    position: relative;
+    isolation: isolate;
+    flex: 1;
+    padding-block-start: calc(var(--projects-top-space) - var(--project-back-bar-size));
+    padding-inline: calc(var(--header-gutter) + var(--navigation-inset-start))
+        calc(var(--header-gutter) + var(--navigation-inset-end));
+}
+
+.projects-list {
+    display: grid;
+    gap: calc(2 * var(--gap-section));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.project-item {
+    display: grid;
+    grid-template-columns: var(--navigation-slot-width) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--gap-group);
+}
+
+.project-image {
+    display: block;
+    justify-self: center;
+    transform: translateX(var(--project-thumbnail-offset));
+    inline-size: var(--project-thumbnail-size);
+    block-size: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    :root[data-project-background] .projects-main::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background: light-dark(#b6d6f2, #49436b);
+        pointer-events: none;
+        animation: project-background-return var(--project-background-duration) ease-out both;
+    }
+}
+
+@keyframes project-background-return {
+    from { opacity: .34; }
+    to { opacity: 0; }
+}
+
+.project-details {
+    display: grid;
+    gap: var(--gap-tight);
+    overflow-wrap: anywhere;
+}
+
+.project-details h2, .project-details p {
+    margin: 0;
+}
+
+.project-details h2 {
+    font-size: var(--text-section);
+    line-height: var(--leading-display);
+}
+
+.project-title {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+.project-store {
+    font-size: var(--text-ui);
+}
+
 .post-list {
     list-style: none;
     padding: 0;
@@ -328,16 +503,17 @@ body > main {
 }
 
 @media (max-width: 37.5rem) {
+    :root {
+        --header-gutter: var(--gap-default);
+        --navigation-inset-start: var(--gap-default);
+    }
+
     body > header, .site-header {
-        padding: var(--gap-group) var(--gap-default) 0;
+        padding-block-start: var(--gap-group);
     }
 
-    .nav-container {
+    .nav-container:not(.site-nav) {
         padding-inline: var(--gap-group);
-    }
-
-    .site-nav {
-        padding-inline: var(--gap-default);
     }
 
     .app-info .name {
