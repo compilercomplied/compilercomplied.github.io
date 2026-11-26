@@ -3,9 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --color-canvas: light-dark(#f5f5f3, #1c1c1c);
+            background: var(--color-canvas);
+        }
+        :root[data-theme="light"] { color-scheme: light; }
+        :root[data-theme="dark"] { color-scheme: dark; }
+    </style>
+    {% set blog = get_section(path="blog/_index.md") %}
     <script src="{{ get_url(path="theme.js", cachebust=true) }}"></script>
-    <script src="{{ get_url(path="navigation.js", cachebust=true) }}" defer></script>
+    <script src="{{ get_url(path="navigation.js", cachebust=true) }}"{% if current_path == "/" or current_path == "/projects/" or (blog.pages | length > 0 and current_path == blog.path) %} data-header-pages="/ /projects/{% if blog.pages | length > 0 %} {{ blog.path }}{% endif %}"{% endif %}></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
@@ -14,7 +25,6 @@
 </head>
 <body>
     <div class="site{% block site_class %}{% endblock site_class %}">
-        {% set blog = get_section(path="blog/_index.md") %}
         <header class="site-header">
             <nav class="nav-container site-nav" aria-label="Site navigation">
                 <div class="nav-links">
