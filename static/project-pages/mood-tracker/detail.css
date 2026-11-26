@@ -245,7 +245,7 @@
 
 .mood-framework-body {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     max-inline-size: 66rem;
     align-items: start;
     gap: var(--mood-group);
@@ -257,6 +257,7 @@
 
 .mood-framework-group {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: .75rem;
     min-inline-size: 0;
 }
@@ -277,10 +278,9 @@
 
 .mood-framework-foundations {
     display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: subgrid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
-    row-gap: var(--gap-default);
+    gap: var(--mood-group);
     padding-block-end: var(--mood-inset);
     border-block-end: 1px solid var(--mood-border);
 }
@@ -305,7 +305,7 @@
 }
 
 .mood-framework-moods span {
-    inline-size: 1.75rem;
+    inline-size: min(100%, 1.75rem);
     aspect-ratio: 1;
     border-radius: 50%;
     background: var(--swatch);
@@ -411,6 +411,17 @@
     }
 }
 
+.mood-framework-examples {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: var(--mood-group);
+}
+
+.mood-framework-examples > .mood-framework-group {
+    flex: 1 1 7.25rem;
+}
+
 .mood-framework-type {
     display: grid;
     gap: .25rem;
@@ -472,13 +483,18 @@
     }
 
     .mood-framework-body {
-        grid-template-columns: minmax(0, 1fr);
         gap: var(--gap-default);
         padding: .75rem;
     }
 
     .mood-framework-foundations {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--gap-default);
         padding-block-end: var(--gap-default);
+    }
+
+    .mood-framework-examples {
+        gap: .75rem;
     }
 
     .mood-framework-group {
@@ -486,7 +502,7 @@
     }
 
     .mood-framework-moods span {
-        inline-size: 1.5rem;
+        inline-size: min(100%, 1.5rem);
     }
 
     .mood-framework-field {
